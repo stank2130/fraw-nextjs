@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Fragment+Mono:ital@0;1&display=swap');
+
+:root {
+  --bg: #0A0A0A;
+  --surface: #111111;
+  --surface2: #181818;
+  --border: #1E1E1E;
+  --border2: #2C2C2C;
+  --text: #EAE6DE;
+  --text2: #A09C94;
+  --muted: #58544E;
+  --hint: #2E2C28;
+  --accent: #E8F03C;
+  --accent-dark: #191900;
+  --font-serif: 'Noto Serif TC', serif;
+  --font-mono: 'Fragment Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); color: var(--text); font-family: var(--font-serif); }
+body { min-height: 100vh; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
