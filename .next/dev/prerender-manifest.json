@@ -1,11 +1,1 @@
-{
-  "version": 4,
-  "routes": {},
-  "dynamicRoutes": {},
-  "notFoundRoutes": [],
-  "preview": {
-    "previewModeId": "f377ccf24df8111a557fa3f654f23799",
-    "previewModeSigningKey": "71b86638ef7151d43fa3a0afb747562d335f4d45345b5643ae2a12b67aea1d21",
-    "previewModeEncryptionKey": "c66cd661b78a94db782e1b93689131d2ba4aa254f90a28490799e8fd2d154c01"
-  }
-}
+{"version":4,"routes":{"/article/snow-peak-merrell-speedarc-matis-gtx":{}},"dynamicRoutes":{"/article/[slug]":{"dataRoute":null,"dataRouteRegex":null,"fallback":null,"fallbackRevalidate":false,"fallbackSourceRoute":"/article/[slug]","routeRegex":"^\\/article\\/([^/]+?)(?:\\/)?$","allowHeader":[]}},"notFoundRoutes":[],"preview":{"previewModeId":"f4d51cd737cceab0fde5508baed9924c","previewModeSigningKey":"d89d247f2f7074f7b65d00497ac200966c2f23c29ffec6898d707d3f952d6546","previewModeEncryptionKey":"7d3b3265f0224864b4e97318c93048978f0efb19c747bb4798d47be5917cb530"}}
