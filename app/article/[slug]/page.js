@@ -26,14 +26,11 @@ function renderBlock(block, index) {
   if (block._type === 'image') {
     return (
       <figure key={index} style={{ margin: '2em 0' }}>
-        <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
-          <Image
-            src={urlFor(block).width(1200).height(675).url()}
-            alt={block.caption || ''}
-            fill
-            style={{ objectFit: 'cover' }}
-          />
-        </div>
+        <img
+          src={urlFor(block).width(1200).fit('max').url()}
+          alt={block.caption || ''}
+          style={{ width: '100%', height: 'auto', display: 'block' }}
+        />
         {block.caption && (
           <figcaption style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--muted)', marginTop: '8px', letterSpacing: '0.04em' }}>
             {block.caption}
@@ -125,13 +122,11 @@ export default async function ArticlePage({ params }) {
 
         {/* COVER */}
         {article.coverImage && (
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '16/7', marginBottom: '48px', overflow: 'hidden' }}>
-            <Image
-              src={urlFor(article.coverImage).width(1400).height(613).url()}
+          <div style={{ marginBottom: '48px', overflow: 'hidden' }}>
+            <img
+              src={urlFor(article.coverImage).width(1400).fit('max').url()}
               alt={article.title}
-              fill
-              style={{ objectFit: 'cover' }}
-              priority
+              style={{ width: '100%', height: 'auto', display: 'block' }}
             />
           </div>
         )}

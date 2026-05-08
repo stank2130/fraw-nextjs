@@ -18,14 +18,14 @@ export default async function HomePage() {
     getSiteSettings(),
   ])
 
-  const navItems = settings?.navLinks?.length > 0
-    ? settings.navLinks
-    : [
-        { label: '發售', href: '#' },
-        { label: '評測', href: '#' },
-        { label: '文化', href: '#' },
-        { label: '典藏', href: '#' },
-      ]
+ const navItems = settings?.navLinks?.length > 0
+  ? settings.navLinks
+  : [
+      { label: '發售', href: '/releases' },
+      { label: '評測', href: '/category/review' },
+      { label: '文化', href: '/category/culture' },
+      { label: '典藏', href: '/category/classic' },
+    ]
 
   const cats = settings?.categories || {}
 
@@ -62,11 +62,12 @@ export default async function HomePage() {
         </span>
         <div style={{ display: 'flex', gap: '28px' }}>
           {navItems.map((l, i) => (
-            <span key={i} style={{
-              fontFamily: 'var(--font-mono)', fontSize: '9px',
-              letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--muted)', cursor: 'pointer'
-            }}>{l.label}</span>
-          ))}
+  <Link key={i} href={l.href || '#'} style={{
+    fontFamily: 'var(--font-mono)', fontSize: '9px',
+    letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--muted)',
+    cursor: 'pointer', textDecoration: 'none'
+  }}>{l.label}</Link>
+))}
         </div>
         <span style={{
           fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em',
