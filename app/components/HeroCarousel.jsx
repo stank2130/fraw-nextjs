@@ -113,10 +113,7 @@ export default function HeroCarousel({ articles, catLabel }) {
       <div style={{ background: 'red', color: 'white', padding: '8px', fontFamily: 'monospace', fontSize: '12px' }}>
         articles count: {articles.length} | titles: {articles.map(a => a.title).join(' / ')}
       </div>
-{/* debug */}
-<div style={{background:'red',color:'white',padding:'8px',fontFamily:'monospace'}}>
-  articles count: {articles.length}
-</div>
+
       <section className="hero-grid">
         <div className="hero-text">
           <div>
