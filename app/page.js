@@ -1,4 +1,4 @@
-import { getLatestArticles, getUpcomingReleases, getFeaturedArticles, getSiteSettings } from '../lib/sanity'
+import { getLatestArticles, getUpcomingReleases, getSiteSettings } from '../lib/sanity'
 import { urlFor } from '../lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -12,8 +12,7 @@ function formatDate(dateStr) {
 }
 
 export default async function HomePage() {
-  const [featuredArticles, articles, releases, settings] = await Promise.all([
-    getFeaturedArticles(),
+  const [articles, releases, settings] = await Promise.all([
     getLatestArticles(6),
     getUpcomingReleases(4),
     getSiteSettings(),
@@ -45,7 +44,7 @@ export default async function HomePage() {
     ? settings.tickerItems
     : ['Jordan 4 Bred Reimagined', 'New Balance 1906R', 'Adidas Samba OG 補貨', 'Nike Air Max 95']
 
-  const featuredWithUrls = (featuredArticles || []).map(a => ({
+  const heroArticles = (settings?.heroArticles || []).map(a => ({
     ...a,
     coverImageUrl: a.coverImage ? urlFor(a.coverImage).width(800).height(600).url() : null
   }))
@@ -140,7 +139,7 @@ export default async function HomePage() {
       </div>
 
       {/* HERO CAROUSEL */}
-      <HeroCarousel articles={featuredWithUrls} catLabel={catLabel} />
+      <HeroCarousel articles={heroArticles} catLabel={catLabel} />
 
       {/* LATEST ARTICLES */}
       <section className="section-pad" style={{ borderBottom: '0.5px solid var(--border)' }}>
