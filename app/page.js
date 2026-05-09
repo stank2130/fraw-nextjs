@@ -95,31 +95,6 @@ export default async function HomePage() {
           gap: 14px;
         }
 
-        .newsletter-wrap {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 44px 32px;
-          border-bottom: 0.5px solid var(--border);
-          gap: 24px;
-        }
-        .newsletter-input-wrap {
-          display: flex;
-          border: 0.5px solid var(--border2);
-          overflow: hidden;
-          flex-shrink: 0;
-        }
-        .newsletter-input {
-          background: var(--surface);
-          border: none;
-          outline: none;
-          padding: 10px 18px;
-          font-size: 12px;
-          color: var(--muted);
-          width: 230px;
-          font-family: var(--font-mono);
-        }
-
         .footer-wrap {
           padding: 22px 32px;
           display: flex;
@@ -144,9 +119,6 @@ export default async function HomePage() {
           .articles-grid { grid-template-columns: 1fr; gap: 28px; }
           .releases-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .section-pad { padding: 28px 20px; }
-          .newsletter-wrap { flex-direction: column; align-items: flex-start; padding: 28px 20px; }
-          .newsletter-input-wrap { width: 100%; }
-          .newsletter-input { width: 100%; flex: 1; }
           .footer-wrap { flex-direction: column; gap: 8px; align-items: flex-start; padding: 20px; }
         }
       `}</style>
@@ -170,11 +142,6 @@ export default async function HomePage() {
             }}>{l.label}</Link>
           ))}
         </div>
-        <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em',
-          textTransform: 'uppercase', background: 'var(--accent)', color: 'var(--accent-dark)',
-          padding: '6px 14px', cursor: 'pointer'
-        }}>訂閱電子報</span>
       </nav>
 
       {/* TICKER */}
@@ -305,20 +272,6 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-
-      {/* NEWSLETTER */}
-      <div className="newsletter-wrap">
-        <div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '10px' }}>每週發售報告</div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', fontWeight: 700, lineHeight: 1.35 }}>
-            {settings?.newsletterHeading || '不錯過任何一雙。每週五直送信箱。'}
-          </div>
-        </div>
-        <div className="newsletter-input-wrap">
-          <input className="newsletter-input" type="email" placeholder="your@email.com" />
-          <button style={{ background: 'var(--accent)', border: 'none', cursor: 'pointer', padding: '10px 18px', fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--accent-dark)' }}>訂閱</button>
-        </div>
-      </div>
 
       {/* FOOTER */}
       <footer className="footer-wrap">
