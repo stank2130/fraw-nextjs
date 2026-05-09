@@ -8,7 +8,18 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric' })
 }
 
-export default function HeroCarousel({ articles, catLabel }) {
+function catLabel(key) {
+  const map = {
+    review: '評測',
+    unboxing: '開箱',
+    culture: '文化',
+    release: '發售',
+    'brand-story': '品牌故事',
+  }
+  return map[key] || key
+}
+
+export default function HeroCarousel({ articles }) {
   const [current, setCurrent] = useState(0)
   const [mounted, setMounted] = useState(false)
 
@@ -110,7 +121,6 @@ export default function HeroCarousel({ articles, catLabel }) {
       `}</style>
 
       <section className="hero-grid">
-        {/* 文字區 */}
         <div className="hero-text">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
@@ -145,7 +155,6 @@ export default function HeroCarousel({ articles, catLabel }) {
           </div>
         </div>
 
-        {/* 圖片區 */}
         <div className="hero-image-wrap">
           {article.coverImageUrl && (
             <img src={article.coverImageUrl} alt={article.title} />
