@@ -67,11 +67,6 @@ export default async function ReleasesPage() {
             }}>{l.label}</Link>
           ))}
         </div>
-        <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em',
-          textTransform: 'uppercase', background: 'var(--accent)', color: 'var(--accent-dark)',
-          padding: '6px 14px', cursor: 'pointer'
-        }}>訂閱電子報</span>
       </nav>
 
       {/* HEADER */}
