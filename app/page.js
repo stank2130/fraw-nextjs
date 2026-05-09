@@ -139,8 +139,7 @@ export default async function HomePage() {
       </div>
 
       {/* HERO CAROUSEL */}
-      <HeroCarousel articles={heroArticles} catLabel={catLabel} />
-
+      <HeroCarousel articles={heroArticles} />
       {/* LATEST ARTICLES */}
       <section className="section-pad" style={{ borderBottom: '0.5px solid var(--border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
