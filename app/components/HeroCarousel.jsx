@@ -10,6 +10,11 @@ function formatDate(dateStr) {
 
 export default function HeroCarousel({ articles, catLabel }) {
   const [current, setCurrent] = useState(0)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!articles || articles.length <= 1) return
@@ -126,4 +131,39 @@ export default function HeroCarousel({ articles, catLabel }) {
                 {formatDate(article.publishedAt)}
                 {article.readTime && ` · ${article.readTime} 分鐘`}
               </span>
-              <Link href={`/article/${article.slug?.current
+              <Link href={`/article/${article.slug?.current}`} style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', borderBottom: '1px solid var(--accent)', paddingBottom: '2px', color: 'var(--text)', textDecoration: 'none' }}>
+                閱讀全文 →
+              </Link>
+            </div>
+            {/* 圓點 — 只在 mounted 後顯示 */}
+            {mounted && articles.length > 1 && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {articles.map((_, i) => (
+                  <button
+                    key={i}
+                    className={`hero-dot${i === current ? ' active' : ''}`}
+                    onClick={() => setCurrent(i)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 圖片區 */}
+        <div className="hero-image-wrap">
+          {article.coverImageUrl && (
+            <img src={article.coverImageUrl} alt={article.title} />
+          )}
+          {/* 箭頭 — 只在 mounted 後顯示 */}
+          {mounted && articles.length > 1 && (
+            <>
+              <button className="hero-arrow hero-arrow-left" onClick={prev}>←</button>
+              <button className="hero-arrow hero-arrow-right" onClick={next}>→</button>
+            </>
+          )}
+        </div>
+      </section>
+    </>
+  )
+}
