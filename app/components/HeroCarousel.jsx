@@ -24,8 +24,8 @@ export default function HeroCarousel({ articles, catLabel }) {
     return () => clearInterval(timer)
   }, [articles])
 
-  const prev = () => setCurrent(prev => (prev - 1 + articles.length) % articles.length)
-  const next = () => setCurrent(prev => (prev + 1) % articles.length)
+  const prev = () => setCurrent(p => (p - 1 + articles.length) % articles.length)
+  const next = () => setCurrent(p => (p + 1) % articles.length)
 
   if (!articles || articles.length === 0) return null
 
@@ -39,7 +39,6 @@ export default function HeroCarousel({ articles, catLabel }) {
           grid-template-columns: 1fr 1fr;
           min-height: 520px;
           border-bottom: 0.5px solid var(--border);
-          position: relative;
         }
         .hero-text {
           padding: 52px 44px;
@@ -98,6 +97,7 @@ export default function HeroCarousel({ articles, catLabel }) {
           border: none;
           padding: 0;
           display: inline-block;
+          transition: background 0.2s;
         }
         .hero-dot.active { background: var(--accent); }
 
@@ -109,12 +109,8 @@ export default function HeroCarousel({ articles, catLabel }) {
         }
       `}</style>
 
-      {/* DEBUG */}
-      <div style={{ background: 'red', color: 'white', padding: '8px', fontFamily: 'monospace', fontSize: '12px' }}>
-        articles count: {articles.length} | titles: {articles.map(a => a.title).join(' / ')}
-      </div>
-
       <section className="hero-grid">
+        {/* 文字區 */}
         <div className="hero-text">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
@@ -142,17 +138,14 @@ export default function HeroCarousel({ articles, catLabel }) {
             {mounted && articles.length > 1 && (
               <div style={{ display: 'flex', gap: '8px' }}>
                 {articles.map((_, i) => (
-                  <button
-                    key={i}
-                    className={`hero-dot${i === current ? ' active' : ''}`}
-                    onClick={() => setCurrent(i)}
-                  />
+                  <button key={i} className={`hero-dot${i === current ? ' active' : ''}`} onClick={() => setCurrent(i)} />
                 ))}
               </div>
             )}
           </div>
         </div>
 
+        {/* 圖片區 */}
         <div className="hero-image-wrap">
           {article.coverImageUrl && (
             <img src={article.coverImageUrl} alt={article.title} />
