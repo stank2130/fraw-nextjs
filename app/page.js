@@ -45,6 +45,11 @@ export default async function HomePage() {
     ? settings.tickerItems
     : ['Jordan 4 Bred Reimagined', 'New Balance 1906R', 'Adidas Samba OG 補貨', 'Nike Air Max 95']
 
+  const featuredWithUrls = (featuredArticles || []).map(a => ({
+    ...a,
+    coverImageUrl: a.coverImage ? urlFor(a.coverImage).width(800).height(600).url() : null
+  }))
+
   return (
     <div style={{ minHeight: '100vh' }}>
 
@@ -135,7 +140,7 @@ export default async function HomePage() {
       </div>
 
       {/* HERO CAROUSEL */}
-      <HeroCarousel articles={featuredArticles} catLabel={catLabel} />
+      <HeroCarousel articles={featuredWithUrls} catLabel={catLabel} />
 
       {/* LATEST ARTICLES */}
       <section className="section-pad" style={{ borderBottom: '0.5px solid var(--border)' }}>
