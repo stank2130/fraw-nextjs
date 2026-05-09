@@ -1,7 +1,8 @@
-import { getLatestArticles, getUpcomingReleases, getFeaturedArticle, getSiteSettings } from '../lib/sanity'
+import { getLatestArticles, getUpcomingReleases, getFeaturedArticles, getSiteSettings } from '../lib/sanity'
 import { urlFor } from '../lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
+import HeroCarousel from './components/HeroCarousel'
 
 export const revalidate = 60
 
@@ -11,8 +12,8 @@ function formatDate(dateStr) {
 }
 
 export default async function HomePage() {
-  const [featured, articles, releases, settings] = await Promise.all([
-    getFeaturedArticle(),
+  const [featuredArticles, articles, releases, settings] = await Promise.all([
+    getFeaturedArticles(),
     getLatestArticles(6),
     getUpcomingReleases(4),
     getSiteSettings(),
@@ -52,37 +53,6 @@ export default async function HomePage() {
 
         .nav-links { display: flex; gap: 28px; }
 
-        .hero-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          min-height: 520px;
-          border-bottom: 0.5px solid var(--border);
-        }
-        .hero-text {
-          padding: 52px 44px;
-          border-right: 0.5px solid var(--border);
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-        .hero-title {
-          font-family: var(--font-serif);
-          font-size: 52px;
-          font-weight: 700;
-          line-height: 1.05;
-          letter-spacing: 0.04em;
-          margin-bottom: 20px;
-        }
-        .hero-image {
-          background: var(--surface);
-          position: relative;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 300px;
-        }
-
         .articles-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -112,10 +82,6 @@ export default async function HomePage() {
 
         @media (max-width: 768px) {
           .nav-links { display: none; }
-          .hero-grid { grid-template-columns: 1fr; min-height: unset; }
-          .hero-text { padding: 28px 20px; border-right: none; border-bottom: 0.5px solid var(--border); }
-          .hero-title { font-size: 30px; }
-          .hero-image { min-height: 220px; order: -1; }
           .articles-grid { grid-template-columns: 1fr; gap: 28px; }
           .releases-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .section-pad { padding: 28px 20px; }
@@ -168,45 +134,8 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* HERO */}
-      {featured && (
-        <section className="hero-grid">
-          <div className="hero-text">
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--accent)' }}>封面故事</span>
-                <div style={{ flex: 1, height: '0.5px', background: 'var(--border2)' }}></div>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', border: '0.5px solid var(--border2)', color: 'var(--muted)', padding: '2px 10px' }}>
-                  {catLabel(featured.category)}
-                </span>
-              </div>
-              <h1 className="hero-title">{featured.title}</h1>
-              <p style={{
-                fontFamily: 'var(--font-serif)', fontSize: '13px', fontWeight: 300,
-                color: 'var(--text2)', lineHeight: 1.9, maxWidth: '340px', marginBottom: '36px'
-              }}>{featured.excerpt}</p>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', letterSpacing: '0.06em' }}>
-                {formatDate(featured.publishedAt)}
-                {featured.readTime && ` · ${featured.readTime} 分鐘`}
-              </span>
-              <Link href={`/article/${featured.slug?.current}`} style={{
-                fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em',
-                textTransform: 'uppercase', borderBottom: '1px solid var(--accent)', paddingBottom: '2px'
-              }}>閱讀全文 →</Link>
-            </div>
-          </div>
-          <div className="hero-image">
-            {featured.coverImage ? (
-              <Image src={urlFor(featured.coverImage).width(800).height(600).url()}
-                alt={featured.title} fill style={{ objectFit: 'cover' }} priority />
-            ) : (
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--hint)' }}>封面圖片</span>
-            )}
-          </div>
-        </section>
-      )}
+      {/* HERO CAROUSEL */}
+      <HeroCarousel articles={featuredArticles} catLabel={catLabel} />
 
       {/* LATEST ARTICLES */}
       <section className="section-pad" style={{ borderBottom: '0.5px solid var(--border)' }}>
