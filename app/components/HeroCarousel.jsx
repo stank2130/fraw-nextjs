@@ -109,8 +109,12 @@ export default function HeroCarousel({ articles, catLabel }) {
         }
       `}</style>
 
+      {/* DEBUG */}
+      <div style={{ background: 'red', color: 'white', padding: '8px', fontFamily: 'monospace', fontSize: '12px' }}>
+        articles count: {articles.length} | titles: {articles.map(a => a.title).join(' / ')}
+      </div>
+
       <section className="hero-grid">
-        {/* 文字區 */}
         <div className="hero-text">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
@@ -135,7 +139,6 @@ export default function HeroCarousel({ articles, catLabel }) {
                 閱讀全文 →
               </Link>
             </div>
-            {/* 圓點 — 只在 mounted 後顯示 */}
             {mounted && articles.length > 1 && (
               <div style={{ display: 'flex', gap: '8px' }}>
                 {articles.map((_, i) => (
@@ -150,12 +153,10 @@ export default function HeroCarousel({ articles, catLabel }) {
           </div>
         </div>
 
-        {/* 圖片區 */}
         <div className="hero-image-wrap">
           {article.coverImageUrl && (
             <img src={article.coverImageUrl} alt={article.title} />
           )}
-          {/* 箭頭 — 只在 mounted 後顯示 */}
           {mounted && articles.length > 1 && (
             <>
               <button className="hero-arrow hero-arrow-left" onClick={prev}>←</button>
