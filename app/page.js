@@ -18,14 +18,14 @@ export default async function HomePage() {
     getSiteSettings(),
   ])
 
- const navItems = settings?.navLinks?.length > 0
-  ? settings.navLinks
-  : [
-      { label: '發售', href: '/releases' },
-      { label: '評測', href: '/category/review' },
-      { label: '文化', href: '/category/culture' },
-      { label: '典藏', href: '/category/classic' },
-    ]
+  const navItems = settings?.navLinks?.length > 0
+    ? settings.navLinks
+    : [
+        { label: '發售', href: '/releases' },
+        { label: '評測', href: '/category/review' },
+        { label: '文化', href: '/category/culture' },
+        { label: '典藏', href: '/category/classic' },
+      ]
 
   const cats = settings?.categories || {}
 
@@ -47,6 +47,110 @@ export default async function HomePage() {
   return (
     <div style={{ minHeight: '100vh' }}>
 
+      <style>{`
+        @keyframes tick { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+
+        .nav-links { display: flex; gap: 28px; }
+
+        .hero-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          min-height: 520px;
+          border-bottom: 0.5px solid var(--border);
+        }
+        .hero-text {
+          padding: 52px 44px;
+          border-right: 0.5px solid var(--border);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+        .hero-title {
+          font-family: var(--font-serif);
+          font-size: 52px;
+          font-weight: 700;
+          line-height: 1.05;
+          letter-spacing: 0.04em;
+          margin-bottom: 20px;
+        }
+        .hero-image {
+          background: var(--surface);
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 300px;
+        }
+
+        .articles-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+        }
+
+        .releases-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+        }
+
+        .newsletter-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 44px 32px;
+          border-bottom: 0.5px solid var(--border);
+          gap: 24px;
+        }
+        .newsletter-input-wrap {
+          display: flex;
+          border: 0.5px solid var(--border2);
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+        .newsletter-input {
+          background: var(--surface);
+          border: none;
+          outline: none;
+          padding: 10px 18px;
+          font-size: 12px;
+          color: var(--muted);
+          width: 230px;
+          font-family: var(--font-mono);
+        }
+
+        .footer-wrap {
+          padding: 22px 32px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-top: 0.5px solid var(--border);
+        }
+
+        .section-pad { padding: 44px 32px; }
+
+        @media (max-width: 1024px) {
+          .articles-grid { grid-template-columns: repeat(2, 1fr); }
+          .releases-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+          .nav-links { display: none; }
+          .hero-grid { grid-template-columns: 1fr; min-height: unset; }
+          .hero-text { padding: 28px 20px; border-right: none; border-bottom: 0.5px solid var(--border); }
+          .hero-title { font-size: 30px; }
+          .hero-image { min-height: 220px; order: -1; }
+          .articles-grid { grid-template-columns: 1fr; gap: 28px; }
+          .releases-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          .section-pad { padding: 28px 20px; }
+          .newsletter-wrap { flex-direction: column; align-items: flex-start; padding: 28px 20px; }
+          .newsletter-input-wrap { width: 100%; }
+          .newsletter-input { width: 100%; flex: 1; }
+          .footer-wrap { flex-direction: column; gap: 8px; align-items: flex-start; padding: 20px; }
+        }
+      `}</style>
+
       {/* NAV */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
@@ -55,19 +159,16 @@ export default async function HomePage() {
         background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(14px)',
         borderBottom: '0.5px solid var(--border)'
       }}>
-        <span style={{
-          fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 700, letterSpacing: '0.28em'
-        }}>
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 700, letterSpacing: '0.28em' }}>
           {settings?.siteTitle || 'F.RAW 阜絡'}
         </span>
-        <div style={{ display: 'flex', gap: '28px' }}>
+        <div className="nav-links">
           {navItems.map((l, i) => (
-  <Link key={i} href={l.href || '#'} style={{
-    fontFamily: 'var(--font-mono)', fontSize: '9px',
-    letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--muted)',
-    cursor: 'pointer', textDecoration: 'none'
-  }}>{l.label}</Link>
-))}
+            <Link key={i} href={l.href || '#'} style={{
+              fontFamily: 'var(--font-mono)', fontSize: '9px',
+              letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none'
+            }}>{l.label}</Link>
+          ))}
         </div>
         <span style={{
           fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em',
@@ -89,10 +190,7 @@ export default async function HomePage() {
           textTransform: 'uppercase', color: 'var(--accent-dark)'
         }}>最新消息</div>
         <div style={{ flex: 1, overflow: 'hidden' }}>
-          <div style={{
-            display: 'flex', width: 'max-content',
-            animation: 'tick 40s linear infinite'
-          }}>
+          <div style={{ display: 'flex', width: 'max-content', animation: 'tick 40s linear infinite' }}>
             {[...tickerItems, ...tickerItems].map((item, i) => (
               <span key={i} style={{
                 fontFamily: 'var(--font-mono)', fontSize: '9px',
@@ -103,18 +201,10 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <style>{`@keyframes tick { from { transform: translateX(0) } to { transform: translateX(-50%) } }`}</style>
-
       {/* HERO */}
       {featured && (
-        <section style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr',
-          minHeight: '520px', borderBottom: '0.5px solid var(--border)'
-        }}>
-          <div style={{
-            padding: '52px 44px', borderRight: '0.5px solid var(--border)',
-            display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
-          }}>
+        <section className="hero-grid">
+          <div className="hero-text">
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--accent)' }}>封面故事</span>
@@ -123,10 +213,7 @@ export default async function HomePage() {
                   {catLabel(featured.category)}
                 </span>
               </div>
-              <h1 style={{
-                fontFamily: 'var(--font-serif)', fontSize: '52px', fontWeight: 700,
-                lineHeight: 1.05, letterSpacing: '0.04em', marginBottom: '20px'
-              }}>{featured.title}</h1>
+              <h1 className="hero-title">{featured.title}</h1>
               <p style={{
                 fontFamily: 'var(--font-serif)', fontSize: '13px', fontWeight: 300,
                 color: 'var(--text2)', lineHeight: 1.9, maxWidth: '340px', marginBottom: '36px'
@@ -143,7 +230,7 @@ export default async function HomePage() {
               }}>閱讀全文 →</Link>
             </div>
           </div>
-          <div style={{ background: 'var(--surface)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="hero-image">
             {featured.coverImage ? (
               <Image src={urlFor(featured.coverImage).width(800).height(600).url()}
                 alt={featured.title} fill style={{ objectFit: 'cover' }} priority />
@@ -155,11 +242,11 @@ export default async function HomePage() {
       )}
 
       {/* LATEST ARTICLES */}
-      <section style={{ padding: '44px 32px', borderBottom: '0.5px solid var(--border)' }}>
+      <section className="section-pad" style={{ borderBottom: '0.5px solid var(--border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>最新文章</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '24px' }}>
+        <div className="articles-grid">
           {articles.map(article => (
             <Link key={article._id} href={`/article/${article.slug?.current}`} style={{ display: 'block', cursor: 'pointer' }}>
               <div style={{ width: '100%', aspectRatio: '16/9', background: 'var(--surface2)', marginBottom: '16px', position: 'relative', overflow: 'hidden' }}>
@@ -182,57 +269,59 @@ export default async function HomePage() {
       </section>
 
       {/* RELEASE RADAR */}
-      <section style={{ padding: '44px 32px', borderBottom: '0.5px solid var(--border)' }}>
+      <section className="section-pad" style={{ borderBottom: '0.5px solid var(--border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>發售雷達</span>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px' }}>
+        <div className="releases-grid">
           {releases.map(release => (
-            <div key={release._id} style={{
-              background: release.hot ? '#0C0B00' : 'var(--surface)',
-              border: `0.5px solid ${release.hot ? '#3A3800' : 'var(--border)'}`,
-              padding: '14px 13px', position: 'relative'
-            }}>
-              {release.hot && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }}></div>}
-              <div style={{ width: '100%', aspectRatio: '4/3', background: 'var(--surface2)', marginBottom: '12px', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {release.image ? (
-                  <Image src={urlFor(release.image).width(300).height(225).url()}
-                    alt={release.name} fill style={{ objectFit: 'contain', padding: '8px' }} />
-                ) : (
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)' }}>圖片</span>
-                )}
+            <Link key={release._id} href={`/releases/${release.slug?.current}`} style={{ display: 'block', textDecoration: 'none' }}>
+              <div style={{
+                background: release.hot ? '#0C0B00' : 'var(--surface)',
+                border: `0.5px solid ${release.hot ? '#3A3800' : 'var(--border)'}`,
+                padding: '14px 13px', position: 'relative'
+              }}>
+                {release.hot && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }}></div>}
+                <div style={{ width: '100%', aspectRatio: '4/3', background: 'var(--surface2)', marginBottom: '12px', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {release.image ? (
+                    <Image src={urlFor(release.image).width(300).height(225).url()}
+                      alt={release.name} fill style={{ objectFit: 'contain', padding: '8px' }} />
+                  ) : (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)' }}>圖片</span>
+                  )}
+                </div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '12px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '12px' }}>{release.name}</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--muted)' }}>{release.releaseDate}</span>
+                  {release.hot ? (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', background: 'var(--accent)', color: 'var(--accent-dark)', padding: '2px 7px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>本週強推</span>
+                  ) : release.price && (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--accent)' }}>${release.price}</span>
+                  )}
+                </div>
               </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '12px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '12px' }}>{release.name}</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--muted)' }}>{release.releaseDate}</span>
-                {release.hot ? (
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', background: 'var(--accent)', color: 'var(--accent-dark)', padding: '2px 7px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>本週強推</span>
-                ) : release.price && (
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--accent)' }}>${release.price}</span>
-                )}
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
 
       {/* NEWSLETTER */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '44px 32px', borderBottom: '0.5px solid var(--border)', gap: '24px' }}>
+      <div className="newsletter-wrap">
         <div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '10px' }}>每週發售報告</div>
           <div style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', fontWeight: 700, lineHeight: 1.35 }}>
             {settings?.newsletterHeading || '不錯過任何一雙。每週五直送信箱。'}
           </div>
         </div>
-        <div style={{ display: 'flex', border: '0.5px solid var(--border2)', overflow: 'hidden', flexShrink: 0 }}>
-          <input style={{ background: 'var(--surface)', border: 'none', outline: 'none', padding: '10px 18px', fontSize: '12px', color: 'var(--muted)', width: '230px', fontFamily: 'var(--font-mono)' }} type="email" placeholder="your@email.com" />
+        <div className="newsletter-input-wrap">
+          <input className="newsletter-input" type="email" placeholder="your@email.com" />
           <button style={{ background: 'var(--accent)', border: 'none', cursor: 'pointer', padding: '10px 18px', fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--accent-dark)' }}>訂閱</button>
         </div>
       </div>
 
       {/* FOOTER */}
-      <footer style={{ padding: '22px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '0.5px solid var(--border)' }}>
+      <footer className="footer-wrap">
         <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
           {settings?.siteTitle || 'F.RAW 阜絡'}
         </span>
