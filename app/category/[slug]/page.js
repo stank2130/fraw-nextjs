@@ -12,14 +12,14 @@ function formatDate(dateStr) {
 
 const categoryMap = {
   review: '評測',
-  culture: '文化',
+  culture: '新聞',
   classic: '典藏',
   unboxing: '開箱',
   release: '發售',
 }
 
 export default async function CategoryPage({ params }) {
-  const { slug } = params
+  const { slug } = await params
   const [allArticles, settings] = await Promise.all([
     getLatestArticles(50),
     getSiteSettings(),
@@ -28,54 +28,95 @@ export default async function CategoryPage({ params }) {
   const articles = allArticles.filter(a => a.category === slug)
   const label = categoryMap[slug] || slug
 
+  const navItems = settings?.navLinks?.length > 0
+    ? settings.navLinks
+    : [
+        { label: '開箱', href: '/category/unboxing' },
+        { label: '評測', href: '/category/review' },
+        { label: '新聞', href: '/category/culture' },
+        { label: '發售', href: '/releases' },
+      ]
+
   return (
     <div style={{ minHeight: '100vh' }}>
+      <style>{`
+        .cat-nav-links { display: flex; gap: 36px; }
+        .cat-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+        }
+        .cat-header { padding: 44px 32px 24px; border-bottom: 0.5px solid var(--border); }
+        .cat-section { padding: 44px 32px; }
+        .cat-footer {
+          padding: 22px 32px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-top: 0.5px solid var(--border);
+        }
+        .nav-inner { display: flex; align-items: center; width: 100%; }
+        .nav-logo { flex: 0 0 auto; }
+        .nav-links-spread {
+          display: flex;
+          flex: 1;
+          justify-content: space-evenly;
+          padding-left: 10%;
+          padding-right: 5%;
+        }
+
+        @media (max-width: 1024px) {
+          .cat-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+          .cat-nav-links { display: none; }
+          .nav-links-spread { display: none; }
+          .cat-grid { grid-template-columns: 1fr; gap: 28px; }
+          .cat-header { padding: 28px 20px 20px; }
+          .cat-section { padding: 28px 20px; }
+          .cat-footer { padding: 20px; flex-direction: column; gap: 8px; align-items: flex-start; }
+        }
+      `}</style>
+
       {/* NAV */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         height: '54px', padding: '0 32px',
         background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(14px)',
-        borderBottom: '0.5px solid var(--border)'
+        borderBottom: '0.5px solid var(--border)',
+        display: 'flex', alignItems: 'center'
       }}>
-        <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 700, letterSpacing: '0.28em', textDecoration: 'none', color: 'var(--text)' }}>
-          {settings?.siteTitle || 'F.RAW 阜絡'}
-        </Link>
-        <div style={{ display: 'flex', gap: '28px' }}>
-          {[
-            { label: '發售', href: '/releases' },
-            { label: '評測', href: '/category/review' },
-            { label: '文化', href: '/category/culture' },
-            { label: '典藏', href: '/category/classic' },
-          ].map((l, i) => (
-            <Link key={i} href={l.href} style={{
-              fontFamily: 'var(--font-mono)', fontSize: '9px',
-              letterSpacing: '0.16em', textTransform: 'uppercase',
-              color: l.href === `/category/${slug}` ? 'var(--accent)' : 'var(--muted)',
-              textDecoration: 'none'
-            }}>{l.label}</Link>
-          ))}
+        <div className="nav-inner">
+          <Link href="/" className="nav-logo" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em', textDecoration: 'none', color: 'var(--text)' }}>
+            {settings?.siteTitle || 'F.RAW 阜絡'}
+          </Link>
+          <div className="nav-links-spread">
+            {navItems.map((l, i) => (
+              <Link key={i} href={l.href || '#'} style={{
+                fontFamily: 'var(--font-mono)', fontSize: '11px',
+                letterSpacing: '0.16em', textTransform: 'uppercase',
+                color: l.href === `/category/${slug}` || (l.href === '/releases' && slug === 'release') ? 'var(--accent)' : 'var(--text)',
+                textDecoration: 'none'
+              }}>{l.label}</Link>
+            ))}
+          </div>
         </div>
-        <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em',
-          textTransform: 'uppercase', background: 'var(--accent)', color: 'var(--accent-dark)',
-          padding: '6px 14px', cursor: 'pointer'
-        }}>訂閱電子報</span>
       </nav>
 
       {/* HEADER */}
-      <div style={{ padding: '44px 32px 24px', borderBottom: '0.5px solid var(--border)' }}>
+      <div className="cat-header">
         <Link href="/" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', textDecoration: 'none', letterSpacing: '0.1em' }}>← 返回首頁</Link>
         <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 700, marginTop: '10px' }}>{label}</h1>
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)' }}>{articles.length} 篇文章</span>
       </div>
 
       {/* ARTICLES */}
-      <section style={{ padding: '44px 32px' }}>
+      <section className="cat-section">
         {articles.length === 0 ? (
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--muted)' }}>目前還沒有文章。</p>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '24px' }}>
+          <div className="cat-grid">
             {articles.map(article => (
               <Link key={article._id} href={`/article/${article.slug?.current}`} style={{ display: 'block', textDecoration: 'none' }}>
                 <div style={{ width: '100%', aspectRatio: '16/9', background: 'var(--surface2)', marginBottom: '16px', position: 'relative', overflow: 'hidden' }}>
@@ -99,7 +140,7 @@ export default async function CategoryPage({ params }) {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ padding: '22px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '0.5px solid var(--border)' }}>
+      <footer className="cat-footer">
         <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
           {settings?.siteTitle || 'F.RAW 阜絡'}
         </span>
