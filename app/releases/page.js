@@ -2,6 +2,7 @@ import { getUpcomingReleases, getSiteSettings } from '../../lib/sanity'
 import { urlFor } from '../../lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
+import MobileNav from '../components/MobileNav'
 
 export const revalidate = 60
 
@@ -11,10 +12,25 @@ export default async function ReleasesPage() {
     getSiteSettings(),
   ])
 
+  const navItems = settings?.navLinks?.length > 0
+    ? settings.navLinks
+    : [
+        { label: '開箱', href: '/category/unboxing' },
+        { label: '評測', href: '/category/review' },
+        { label: '新聞', href: '/category/culture' },
+        { label: '發售', href: '/releases' },
+      ]
+
   return (
     <div style={{ minHeight: '100vh' }}>
       <style>{`
-        .releases-nav-links { display: flex; gap: 36px; }
+        .releases-nav-links-spread {
+          display: flex;
+          flex: 1;
+          justify-content: space-evenly;
+          padding-left: 10%;
+          padding-right: 5%;
+        }
         .releases-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
@@ -33,7 +49,7 @@ export default async function ReleasesPage() {
           .releases-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 768px) {
-          .releases-nav-links { display: none; }
+          .releases-nav-links-spread { display: none; }
           .releases-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .releases-header { padding: 28px 20px 20px; }
           .releases-section { padding: 24px 20px; }
@@ -44,28 +60,26 @@ export default async function ReleasesPage() {
       {/* NAV */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         height: '54px', padding: '0 32px',
         background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(14px)',
-        borderBottom: '0.5px solid var(--border)'
+        borderBottom: '0.5px solid var(--border)',
+        display: 'flex', alignItems: 'center'
       }}>
-        <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em', textDecoration: 'none', color: 'var(--text)' }}>
-          {settings?.siteTitle || 'F.RAW 阜絡'}
-        </Link>
-        <div className="releases-nav-links">
-          {[
-           { label: '開箱', href: '/category/unboxing' },
-{ label: '評測', href: '/category/review' },
-{ label: '新聞', href: '/category/culture' },
-{ label: '發售', href: '/releases' },
-          ].map((l, i) => (
-            <Link key={i} href={l.href} style={{
-              fontFamily: 'var(--font-mono)', fontSize: '11px',
-              letterSpacing: '0.16em', textTransform: 'uppercase',
-              color: l.href === '/releases' ? 'var(--accent)' : 'var(--text)',
-              textDecoration: 'none'
-            }}>{l.label}</Link>
-          ))}
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em', textDecoration: 'none', color: 'var(--text)', flexShrink: 0 }}>
+            {settings?.siteTitle || 'F.RAW 阜絡'}
+          </Link>
+          <div className="releases-nav-links-spread">
+            {navItems.map((l, i) => (
+              <Link key={i} href={l.href || '#'} style={{
+                fontFamily: 'var(--font-mono)', fontSize: '11px',
+                letterSpacing: '0.16em', textTransform: 'uppercase',
+                color: l.href === '/releases' ? 'var(--accent)' : 'var(--text)',
+                textDecoration: 'none'
+              }}>{l.label}</Link>
+            ))}
+          </div>
+          <MobileNav navItems={navItems} siteTitle={settings?.siteTitle} />
         </div>
       </nav>
 
