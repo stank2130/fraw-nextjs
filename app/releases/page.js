@@ -54,10 +54,10 @@ export default async function ReleasesPage() {
         </Link>
         <div className="releases-nav-links">
           {[
-            { label: '發售', href: '/releases' },
-            { label: '評測', href: '/category/review' },
-            { label: '文化', href: '/category/culture' },
-            { label: '典藏', href: '/category/classic' },
+           { label: '開箱', href: '/category/unboxing' },
+{ label: '評測', href: '/category/review' },
+{ label: '新聞', href: '/category/culture' },
+{ label: '發售', href: '/releases' },
           ].map((l, i) => (
             <Link key={i} href={l.href} style={{
               fontFamily: 'var(--font-mono)', fontSize: '11px',
