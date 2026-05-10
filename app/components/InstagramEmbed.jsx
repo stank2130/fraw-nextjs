@@ -1,15 +1,35 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
-export default function InstagramEmbed({ url }) {
-  const ref = useRef(null)
-
+export default function InstagramEmbed({ url, type = 'post' }) {
   useEffect(() => {
     if (window.instgrm) {
       window.instgrm.Embeds.process()
     }
   }, [url])
+
+  if (type === 'reel') {
+    const reelId = url.match(/\/reel\/([^/?]+)/)?.[1]
+    if (!reelId) return null
+    return (
+      <div style={{ position: 'relative', width: '100%', maxWidth: '400px', margin: '0 auto' }}>
+        <iframe
+          src={`https://www.instagram.com/reel/${reelId}/embed`}
+          style={{
+            width: '100%',
+            height: '740px',
+            border: 'none',
+            overflow: 'hidden',
+            borderRadius: '4px',
+          }}
+          scrolling="no"
+          allowTransparency
+          allowFullScreen
+        />
+      </div>
+    )
+  }
 
   return (
     <>
@@ -29,7 +49,6 @@ export default function InstagramEmbed({ url }) {
           padding: '0',
           width: '100%'
         }}
-        ref={ref}
       />
     </>
   )
