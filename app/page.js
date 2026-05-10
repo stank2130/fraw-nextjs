@@ -55,7 +55,21 @@ export default async function HomePage() {
       <style>{`
         @keyframes tick { from { transform: translateX(0) } to { transform: translateX(-50%) } }
 
-        .nav-links { display: flex; gap: 28px; }
+        .nav-inner {
+          display: flex;
+          align-items: center;
+          width: 100%;
+        }
+        .nav-logo {
+          flex: 0 0 auto;
+        }
+        .nav-links {
+          display: flex;
+          flex: 1;
+          justify-content: space-evenly;
+          padding-left: 10%;
+          padding-right: 5%;
+        }
 
         .articles-grid {
           display: grid;
@@ -96,21 +110,24 @@ export default async function HomePage() {
       {/* NAV */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         height: '54px', padding: '0 32px',
         background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(14px)',
-        borderBottom: '0.5px solid var(--border)'
+        borderBottom: '0.5px solid var(--border)',
+        display: 'flex', alignItems: 'center'
       }}>
-        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 700, letterSpacing: '0.28em' }}>
-          {settings?.siteTitle || 'F.RAW 阜絡'}
-        </span>
-        <div className="nav-links">
-          {navItems.map((l, i) => (
-            <Link key={i} href={l.href || '#'} style={{
-  fontFamily: 'var(--font-mono)', fontSize: '11px',
-  letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text)', textDecoration: 'none'
-}}>{l.label}</Link>
-          ))}
+        <div className="nav-inner">
+          <span className="nav-logo" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em' }}>
+            {settings?.siteTitle || 'F.RAW 阜絡'}
+          </span>
+          <div className="nav-links">
+            {navItems.map((l, i) => (
+              <Link key={i} href={l.href || '#'} style={{
+                fontFamily: 'var(--font-mono)', fontSize: '11px',
+                letterSpacing: '0.16em', textTransform: 'uppercase',
+                color: 'var(--text)', textDecoration: 'none'
+              }}>{l.label}</Link>
+            ))}
+          </div>
         </div>
       </nav>
 
@@ -140,6 +157,7 @@ export default async function HomePage() {
 
       {/* HERO CAROUSEL */}
       <HeroCarousel articles={heroArticles} />
+
       {/* LATEST ARTICLES */}
       <section className="section-pad" style={{ borderBottom: '0.5px solid var(--border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -207,7 +225,7 @@ export default async function HomePage() {
 
       {/* FOOTER */}
       <footer className="footer-wrap">
-        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em' }}>
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
           {settings?.siteTitle || 'F.RAW 阜絡'}
         </span>
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--hint)' }}>© 2025 F.RAW 阜絡</span>
