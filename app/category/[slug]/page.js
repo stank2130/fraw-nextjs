@@ -2,6 +2,7 @@ import { getLatestArticles, getSiteSettings } from '../../../lib/sanity'
 import { urlFor } from '../../../lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
+import MobileNav from '../../components/MobileNav'
 
 export const revalidate = 60
 
@@ -40,38 +41,15 @@ export default async function CategoryPage({ params }) {
   return (
     <div style={{ minHeight: '100vh' }}>
       <style>{`
-        .cat-nav-links { display: flex; gap: 36px; }
-        .cat-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
-        }
+        .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
         .cat-header { padding: 44px 32px 24px; border-bottom: 0.5px solid var(--border); }
         .cat-section { padding: 44px 32px; }
-        .cat-footer {
-          padding: 22px 32px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          border-top: 0.5px solid var(--border);
-        }
-        .nav-inner { display: flex; align-items: center; width: 100%; }
-        .nav-logo { flex: 0 0 auto; }
-        .nav-links-spread {
-          display: flex;
-          flex: 1;
-          justify-content: space-evenly;
-          padding-left: 10%;
-          padding-right: 5%;
-        }
+        .cat-footer { padding: 22px 32px; display: flex; align-items: center; justify-content: space-between; border-top: 0.5px solid var(--border); }
+        .cat-nav-spread { display: flex; flex: 1; justify-content: space-evenly; padding-left: 10%; padding-right: 5%; }
 
-        @media (max-width: 1024px) {
-          .cat-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
+        @media (max-width: 1024px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 768px) {
-          .cat-nav-links { display: none; }
-          .nav-links-spread { display: none; }
+          .cat-nav-spread { display: none; }
           .cat-grid { grid-template-columns: 1fr; gap: 28px; }
           .cat-header { padding: 28px 20px 20px; }
           .cat-section { padding: 28px 20px; }
@@ -87,20 +65,21 @@ export default async function CategoryPage({ params }) {
         borderBottom: '0.5px solid var(--border)',
         display: 'flex', alignItems: 'center'
       }}>
-        <div className="nav-inner">
-          <Link href="/" className="nav-logo" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em', textDecoration: 'none', color: 'var(--text)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em', textDecoration: 'none', color: 'var(--text)', flexShrink: 0 }}>
             {settings?.siteTitle || 'F.RAW 阜絡'}
           </Link>
-          <div className="nav-links-spread">
+          <div className="cat-nav-spread">
             {navItems.map((l, i) => (
               <Link key={i} href={l.href || '#'} style={{
                 fontFamily: 'var(--font-mono)', fontSize: '11px',
                 letterSpacing: '0.16em', textTransform: 'uppercase',
-                color: l.href === `/category/${slug}` || (l.href === '/releases' && slug === 'release') ? 'var(--accent)' : 'var(--text)',
+                color: l.href === `/category/${slug}` ? 'var(--accent)' : 'var(--text)',
                 textDecoration: 'none'
               }}>{l.label}</Link>
             ))}
           </div>
+          <MobileNav navItems={navItems} siteTitle={settings?.siteTitle} />
         </div>
       </nav>
 
