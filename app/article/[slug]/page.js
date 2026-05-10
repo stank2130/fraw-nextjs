@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getArticleBySlug, getAllArticleSlugs, getRelatedArticles, urlFor } from '../../../lib/sanity'
+import { getArticleBySlug, getAllArticleSlugs, getRelatedArticles, getSiteSettings, urlFor } from '../../../lib/sanity'
 import { notFound } from 'next/navigation'
 import InstagramEmbed from '../../components/InstagramEmbed'
 
@@ -69,11 +69,15 @@ const catMap = { review: '評測', unboxing: '開箱', culture: '文化', releas
 
 export default async function ArticlePage({ params }) {
   const { slug } = await params
-  const article = await getArticleBySlug(slug)
+  const [article, settings] = await Promise.all([
+    getArticleBySlug(slug),
+    getSiteSettings(),
+  ])
   if (!article) notFound()
 
   const related = await getRelatedArticles(article.category, article._id)
   const youtubeId = getYoutubeId(article.youtubeUrl)
+  const sidebarAds = settings?.sidebarAds || []
 
   return (
     <div>
@@ -87,7 +91,6 @@ export default async function ArticlePage({ params }) {
           gap: 48px;
           align-items: start;
         }
-        .article-main {}
         .article-sidebar {
           position: sticky;
           top: 74px;
@@ -162,25 +165,32 @@ export default async function ArticlePage({ params }) {
           position: absolute;
           top: 0; left: 0;
         }
-        .affiliate-placeholder {
+        .ad-block {
+          display: block;
           width: 100%;
-          aspect-ratio: 1/1;
-          background: var(--surface2);
-          border: 0.5px dashed var(--border2);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-direction: column;
-          gap: 8px;
           margin-bottom: 12px;
-          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+        .ad-block:last-child { margin-bottom: 0; }
+        .ad-block img {
+          width: 100%;
+          height: auto;
+          display: block;
+          transition: opacity 0.2s;
+        }
+        .ad-block:hover img { opacity: 0.85; }
+        .ad-label {
+          font-family: var(--font-mono);
+          font-size: 7px;
+          color: var(--muted);
+          letterSpacing: 0.08em;
+          margin-top: 6px;
+          display: block;
         }
 
         @media (max-width: 1024px) {
-          .article-layout {
-            grid-template-columns: 1fr 240px;
-            gap: 32px;
-          }
+          .article-layout { grid-template-columns: 1fr 240px; gap: 32px; }
         }
 
         @media (max-width: 768px) {
@@ -218,7 +228,7 @@ export default async function ArticlePage({ params }) {
       <div className="article-layout">
 
         {/* 左：文章內文 */}
-        <article className="article-main">
+        <article>
 
           {/* META */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px', flexWrap: 'wrap' }}>
@@ -294,30 +304,6 @@ export default async function ArticlePage({ params }) {
             {article.body?.map((block, i) => renderBlock(block, i))}
           </div>
 
-          {/* 相關文章（手機版顯示在這） */}
-          {related.length > 0 && (
-            <div style={{ marginTop: '60px', paddingTop: '32px', borderTop: '0.5px solid var(--border)', display: 'none' }} className="related-mobile">
-              <span className="sidebar-label">相關文章</span>
-              {related.map(r => (
-                <Link key={r._id} href={`/article/${r.slug?.current}`} className="related-item">
-                  <div className="related-thumb">
-                    {r.coverImage && (
-                      <img src={urlFor(r.coverImage).width(128).height(96).url()} alt={r.title} />
-                    )}
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '4px' }}>
-                      {catMap[r.category] || r.category}
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '12px', fontWeight: 600, lineHeight: 1.45, color: 'var(--text)' }}>
-                      {r.title}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-
           {/* BACK */}
           <div style={{ marginTop: '60px', paddingTop: '24px', borderTop: '0.5px solid var(--border)' }}>
             <Link href="/" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)' }}>
@@ -329,18 +315,20 @@ export default async function ArticlePage({ params }) {
         {/* 右：Sidebar */}
         <aside className="article-sidebar">
 
-          {/* 聯盟行銷版位 */}
-          <div className="sidebar-section">
-            <span className="sidebar-label">推薦好物</span>
-            <div className="affiliate-placeholder">
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>廣告版位</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', color: 'var(--hint)' }}>250 × 250</span>
+          {/* 聯盟行銷廣告 */}
+          {sidebarAds.length > 0 && (
+            <div className="sidebar-section">
+              <span className="sidebar-label">推薦好物</span>
+              {sidebarAds.map((ad, i) => (
+                <a key={i} href={ad.url} target="_blank" rel="noopener noreferrer sponsored" className="ad-block">
+                  {ad.image && (
+                    <img src={urlFor(ad.image).width(280).height(280).url()} alt={ad.label || '廣告'} />
+                  )}
+                  {ad.label && <span className="ad-label">{ad.label}</span>}
+                </a>
+              ))}
             </div>
-            <div className="affiliate-placeholder">
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>廣告版位</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', color: 'var(--hint)' }}>250 × 250</span>
-            </div>
-          </div>
+          )}
 
           {/* 相關文章 */}
           {related.length > 0 && (
