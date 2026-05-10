@@ -1,16 +1,35 @@
-import { getUpcomingReleases, getSiteSettings } from '../../lib/sanity'
-import { urlFor } from '../../lib/sanity'
-import Link from 'next/link'
 import Image from 'next/image'
-import MobileNav from '../components/MobileNav'
+import Link from 'next/link'
+import { getReleaseBySlug, getAllReleaseSlugs, getSiteSettings, urlFor } from '../../../lib/sanity'
+import { notFound } from 'next/navigation'
+import MobileNav from '../../components/MobileNav'
 
 export const revalidate = 60
 
-export default async function ReleasesPage() {
-  const [releases, settings] = await Promise.all([
-    getUpcomingReleases(20),
+export async function generateStaticParams() {
+  const slugs = await getAllReleaseSlugs()
+  return slugs.map(s => ({ slug: s.slug }))
+}
+
+export async function generateMetadata({ params }) {
+  const { slug } = await params
+  const release = await getReleaseBySlug(slug)
+  if (!release) return {}
+  return { title: `${release.name} — F.RAW 阜絡` }
+}
+
+const currencySymbol = (currency) => {
+  const map = { USD: '$', TWD: 'NT$', RMB: '¥', JPY: '¥', HKD: 'HK$', EUR: '€', GBP: '£' }
+  return map[currency] || '$'
+}
+
+export default async function ReleaseDetailPage({ params }) {
+  const { slug } = await params
+  const [release, settings] = await Promise.all([
+    getReleaseBySlug(slug),
     getSiteSettings(),
   ])
+  if (!release) notFound()
 
   const navItems = settings?.navLinks?.length > 0
     ? settings.navLinks
@@ -24,36 +43,46 @@ export default async function ReleasesPage() {
   return (
     <div style={{ minHeight: '100vh' }}>
       <style>{`
-        .releases-nav-links-spread {
+        .release-detail-wrap {
+          max-width: 960px;
+          margin: 0 auto;
+          padding: 52px 32px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 52px;
+        }
+        .release-image-block {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 1/1;
+          background: var(--surface);
+        }
+        .release-meta-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 0.5px solid var(--border);
+        }
+        .release-nav-spread {
           display: flex;
           flex: 1;
           justify-content: space-evenly;
           padding-left: 10%;
           padding-right: 5%;
         }
-        .releases-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-        }
-        .releases-header { padding: 44px 32px 24px; border-bottom: 0.5px solid var(--border); }
-        .releases-section { padding: 44px 32px; }
-        .releases-footer {
+        .release-footer {
           padding: 22px 32px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           border-top: 0.5px solid var(--border);
         }
-        @media (max-width: 1024px) {
-          .releases-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+
         @media (max-width: 768px) {
-          .releases-nav-links-spread { display: none; }
-          .releases-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-          .releases-header { padding: 28px 20px 20px; }
-          .releases-section { padding: 24px 20px; }
-          .releases-footer { padding: 20px; flex-direction: column; gap: 8px; align-items: flex-start; }
+          .release-detail-wrap { grid-template-columns: 1fr; padding: 28px 20px; gap: 28px; }
+          .release-nav-spread { display: none; }
+          .release-footer { padding: 20px; flex-direction: column; gap: 8px; align-items: flex-start; }
         }
       `}</style>
 
@@ -66,10 +95,10 @@ export default async function ReleasesPage() {
         display: 'flex', alignItems: 'center'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-          <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em', textDecoration: 'none', color: 'var(--text)', flexShrink: 0 }}>
-            {settings?.siteTitle || 'F.RAW 阜絡'}
+          <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em', flexShrink: 0 }}>
+            F.RAW 阜絡
           </Link>
-          <div className="releases-nav-links-spread">
+          <div className="release-nav-spread">
             {navItems.map((l, i) => (
               <Link key={i} href={l.href || '#'} style={{
                 fontFamily: 'var(--font-mono)', fontSize: '11px',
@@ -79,56 +108,91 @@ export default async function ReleasesPage() {
               }}>{l.label}</Link>
             ))}
           </div>
-          <MobileNav navItems={navItems} siteTitle={settings?.siteTitle} />
+          <MobileNav navItems={navItems} siteTitle="F.RAW 阜絡" />
         </div>
       </nav>
 
-      {/* HEADER */}
-      <div className="releases-header">
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)' }}>發售雷達</span>
-        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '36px', fontWeight: 700, marginTop: '10px' }}>即將發售</h1>
+      <div className="release-detail-wrap">
+
+        {/* 左：圖片 */}
+        <div className="release-image-block">
+          {release.image ? (
+            <Image
+              src={urlFor(release.image).width(800).height(800).url()}
+              alt={release.name}
+              fill
+              style={{ objectFit: 'contain', padding: '24px' }}
+              priority
+            />
+          ) : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--hint)' }}>暫無圖片</span>
+            </div>
+          )}
+          {release.hot && (
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'var(--accent)' }}></div>
+          )}
+        </div>
+
+        {/* 右：資訊 */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ marginBottom: '24px' }}>
+            {release.hot && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', background: 'var(--accent)', color: 'var(--accent-dark)', padding: '3px 10px', letterSpacing: '0.12em', textTransform: 'uppercase', display: 'inline-block', marginBottom: '14px' }}>本週強推</span>
+            )}
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>{release.brand}</div>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', fontWeight: 700, lineHeight: 1.15, color: 'var(--text)' }}>{release.name}</h1>
+          </div>
+
+          {release.price?.amount && (
+            <div style={{ marginBottom: '28px' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '24px', color: 'var(--accent)', letterSpacing: '0.04em' }}>
+                {currencySymbol(release.price.currency)}{release.price.amount.toLocaleString()}
+              </span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', marginLeft: '8px' }}>
+                {release.price.currency}
+              </span>
+            </div>
+          )}
+
+          <div style={{ borderTop: '0.5px solid var(--border)' }}>
+            {release.releaseDate && (
+              <div className="release-meta-row">
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>發售日期</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text)' }}>{release.releaseDate}</span>
+              </div>
+            )}
+            {release.colorway && (
+              <div className="release-meta-row">
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>配色</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text)' }}>{release.colorway}</span>
+              </div>
+            )}
+            {release.styleCode && (
+              <div className="release-meta-row">
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>貨號</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text)' }}>{release.styleCode}</span>
+              </div>
+            )}
+            {release.where && (
+              <div className="release-meta-row">
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>購買管道</span>
+                <a href={release.where} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--accent)', textDecoration: 'underline' }}>前往購買 →</a>
+              </div>
+            )}
+            {release.notes && (
+              <div style={{ padding: '16px 0' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '10px' }}>備註</div>
+                <p style={{ fontFamily: 'var(--font-serif)', fontSize: '13px', fontWeight: 300, color: 'var(--text2)', lineHeight: 1.9 }}>{release.notes}</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* GRID */}
-      <section className="releases-section">
-        <div className="releases-grid">
-          {releases.map(release => (
-            <Link key={release._id} href={`/releases/${release.slug?.current}`} style={{ display: 'block', textDecoration: 'none' }}>
-              <div style={{
-                background: release.hot ? '#0C0B00' : 'var(--surface)',
-                border: `0.5px solid ${release.hot ? '#3A3800' : 'var(--border)'}`,
-                padding: '14px 13px', position: 'relative'
-              }}>
-                {release.hot && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }}></div>}
-                <div style={{ width: '100%', aspectRatio: '4/3', background: 'var(--surface2)', marginBottom: '12px', position: 'relative', overflow: 'hidden' }}>
-                  {release.image ? (
-                    <Image src={urlFor(release.image).width(300).height(225).url()}
-                      alt={release.name} fill style={{ objectFit: 'contain', padding: '8px' }} />
-                  ) : (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>圖片</span>
-                  )}
-                </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '12px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '12px' }}>{release.name}</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--muted)' }}>{release.releaseDate}</span>
-                  {release.hot ? (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', background: 'var(--accent)', color: 'var(--accent-dark)', padding: '2px 7px' }}>本週強推</span>
-                  ) : release.price && (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--accent)' }}>${release.price}</span>
-                  )}
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {/* FOOTER */}
-      <footer className="releases-footer">
-        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
-          {settings?.siteTitle || 'F.RAW 阜絡'}
-        </span>
+      <footer className="release-footer">
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>F.RAW 阜絡</span>
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--hint)' }}>© 2025 F.RAW 阜絡</span>
       </footer>
     </div>
