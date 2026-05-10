@@ -3,6 +3,7 @@ import { urlFor } from '../lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
 import HeroCarousel from './components/HeroCarousel'
+import MobileNav from './components/MobileNav'
 
 export const revalidate = 60
 
@@ -18,14 +19,14 @@ export default async function HomePage() {
     getSiteSettings(),
   ])
 
-const navItems = settings?.navLinks?.length > 0
-  ? settings.navLinks
-  : [
-      { label: '開箱', href: '/category/unboxing' },
-      { label: '評測', href: '/category/review' },
-      { label: '新聞', href: '/category/culture' },
-      { label: '發售', href: '/releases' },
-    ]
+  const navItems = settings?.navLinks?.length > 0
+    ? settings.navLinks
+    : [
+        { label: '開箱', href: '/category/unboxing' },
+        { label: '評測', href: '/category/review' },
+        { label: '新聞', href: '/category/culture' },
+        { label: '發售', href: '/releases' },
+      ]
 
   const cats = settings?.categories || {}
 
@@ -33,7 +34,7 @@ const navItems = settings?.navLinks?.length > 0
     const map = {
       review: cats.review || '評測',
       unboxing: cats.unboxing || '開箱',
-      culture: cats.culture || '文化',
+      culture: cats.culture || '新聞',
       release: cats.release || '發售',
       'brand-story': cats.brandStory || '品牌故事',
     }
@@ -60,10 +61,8 @@ const navItems = settings?.navLinks?.length > 0
           align-items: center;
           width: 100%;
         }
-        .nav-logo {
-          flex: 0 0 auto;
-        }
-        .nav-links {
+        .nav-logo { flex: 0 0 auto; }
+        .nav-links-spread {
           display: flex;
           flex: 1;
           justify-content: space-evenly;
@@ -99,7 +98,7 @@ const navItems = settings?.navLinks?.length > 0
         }
 
         @media (max-width: 768px) {
-          .nav-links { display: none; }
+          .nav-links-spread { display: none; }
           .articles-grid { grid-template-columns: 1fr; gap: 28px; }
           .releases-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .section-pad { padding: 28px 20px; }
@@ -119,7 +118,7 @@ const navItems = settings?.navLinks?.length > 0
           <span className="nav-logo" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em' }}>
             {settings?.siteTitle || 'F.RAW 阜絡'}
           </span>
-          <div className="nav-links">
+          <div className="nav-links-spread">
             {navItems.map((l, i) => (
               <Link key={i} href={l.href || '#'} style={{
                 fontFamily: 'var(--font-mono)', fontSize: '11px',
@@ -128,6 +127,7 @@ const navItems = settings?.navLinks?.length > 0
               }}>{l.label}</Link>
             ))}
           </div>
+          <MobileNav navItems={navItems} siteTitle={settings?.siteTitle} />
         </div>
       </nav>
 
