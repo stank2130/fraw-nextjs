@@ -188,10 +188,17 @@ export default async function ArticlePage({ params }) {
           </div>
         )}
 
-        {/* INSTAGRAM */}
+        {/* INSTAGRAM 貼文 */}
         {article.instagramUrl && (
           <div className="ig-wrap">
-            <InstagramEmbed url={article.instagramUrl} />
+            <InstagramEmbed url={article.instagramUrl} type="post" />
+          </div>
+        )}
+
+        {/* INSTAGRAM REELS */}
+        {article.instagramReelUrl && (
+          <div className="ig-wrap">
+            <InstagramEmbed url={article.instagramReelUrl} type="reel" />
           </div>
         )}
 
