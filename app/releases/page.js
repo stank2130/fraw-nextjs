@@ -14,7 +14,7 @@ export default async function ReleasesPage() {
   return (
     <div style={{ minHeight: '100vh' }}>
       <style>{`
-        .releases-nav-links { display: flex; gap: 28px; }
+        .releases-nav-links { display: flex; gap: 36px; }
         .releases-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
@@ -49,7 +49,7 @@ export default async function ReleasesPage() {
         background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(14px)',
         borderBottom: '0.5px solid var(--border)'
       }}>
-        <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 700, letterSpacing: '0.28em', textDecoration: 'none', color: 'var(--text)' }}>
+        <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em', textDecoration: 'none', color: 'var(--text)' }}>
           {settings?.siteTitle || 'F.RAW 阜絡'}
         </Link>
         <div className="releases-nav-links">
@@ -60,9 +60,9 @@ export default async function ReleasesPage() {
             { label: '典藏', href: '/category/classic' },
           ].map((l, i) => (
             <Link key={i} href={l.href} style={{
-              fontFamily: 'var(--font-mono)', fontSize: '9px',
+              fontFamily: 'var(--font-mono)', fontSize: '11px',
               letterSpacing: '0.16em', textTransform: 'uppercase',
-              color: l.href === '/releases' ? 'var(--accent)' : 'var(--muted)',
+              color: l.href === '/releases' ? 'var(--accent)' : 'var(--text)',
               textDecoration: 'none'
             }}>{l.label}</Link>
           ))}
