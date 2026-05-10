@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { getArticleBySlug, getAllArticleSlugs, urlFor } from '../../../lib/sanity'
 import { notFound } from 'next/navigation'
+import InstagramEmbed from '../../components/InstagramEmbed'
 
 export const revalidate = 60
 
@@ -103,6 +103,11 @@ export default async function ArticlePage({ params }) {
           width: 100%; height: 100%;
           border: none;
         }
+        .ig-wrap {
+          margin: 2em 0;
+          display: flex;
+          justify-content: center;
+        }
 
         @media (max-width: 768px) {
           .article-wrap { padding: 32px 20px; }
@@ -126,7 +131,6 @@ export default async function ArticlePage({ params }) {
         </Link>
       </nav>
 
-      {/* ARTICLE */}
       <article className="article-wrap">
 
         {/* META */}
@@ -181,6 +185,13 @@ export default async function ArticlePage({ params }) {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
+          </div>
+        )}
+
+        {/* INSTAGRAM */}
+        {article.instagramUrl && (
+          <div className="ig-wrap">
+            <InstagramEmbed url={article.instagramUrl} />
           </div>
         )}
 
