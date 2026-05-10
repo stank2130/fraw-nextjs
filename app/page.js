@@ -18,14 +18,14 @@ export default async function HomePage() {
     getSiteSettings(),
   ])
 
-  const navItems = settings?.navLinks?.length > 0
-    ? settings.navLinks
-    : [
-        { label: '發售', href: '/releases' },
-        { label: '評測', href: '/category/review' },
-        { label: '文化', href: '/category/culture' },
-        { label: '典藏', href: '/category/classic' },
-      ]
+const navItems = settings?.navLinks?.length > 0
+  ? settings.navLinks
+  : [
+      { label: '開箱', href: '/category/unboxing' },
+      { label: '評測', href: '/category/review' },
+      { label: '新聞', href: '/category/culture' },
+      { label: '發售', href: '/releases' },
+    ]
 
   const cats = settings?.categories || {}
 
