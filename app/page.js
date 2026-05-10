@@ -107,9 +107,9 @@ export default async function HomePage() {
         <div className="nav-links">
           {navItems.map((l, i) => (
             <Link key={i} href={l.href || '#'} style={{
-              fontFamily: 'var(--font-mono)', fontSize: '9px',
-              letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none'
-            }}>{l.label}</Link>
+  fontFamily: 'var(--font-mono)', fontSize: '11px',
+  letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--text)', textDecoration: 'none'
+}}>{l.label}</Link>
           ))}
         </div>
       </nav>
@@ -207,7 +207,7 @@ export default async function HomePage() {
 
       {/* FOOTER */}
       <footer className="footer-wrap">
-        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', fontWeight: 700, letterSpacing: '0.28em' }}>
           {settings?.siteTitle || 'F.RAW 阜絡'}
         </span>
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--hint)' }}>© 2025 F.RAW 阜絡</span>
