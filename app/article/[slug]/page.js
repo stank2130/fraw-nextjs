@@ -100,7 +100,7 @@ export default async function ArticlePage({ params }) {
         .ad-block:last-child { margin-bottom: 0; }
         .ad-block img { width: 100%; height: auto; display: block; }
         .ad-block:hover img { opacity: 0.85; }
-        .ad-label { font-family: var(--font-mono); font-size: 7px; color: var(--muted); margin-top: 6px; display: block; }
+        .ad-label { font-family: var(--font-mono); font-size: 11px; color: var(--text); margin-top: 6px; display: block; }
         .article-nav-spread { display: flex; flex: 1; justify-content: space-evenly; padding-left: 10%; padding-right: 5%; }
 
         @media (max-width: 1024px) { .article-layout { grid-template-columns: 1fr 240px; gap: 32px; } }
