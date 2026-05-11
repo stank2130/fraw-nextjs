@@ -1,8 +1,8 @@
-import Image from 'next/image'
+import { getUpcomingReleases, getSiteSettings } from '../../lib/sanity'
+import { urlFor } from '../../lib/sanity'
 import Link from 'next/link'
-import { getReleaseBySlug, getAllReleaseSlugs, getSiteSettings, urlFor } from '../../../lib/sanity'
-import { notFound } from 'next/navigation'
-import MobileNav from '../../components/MobileNav'
+import Image from 'next/image'
+import MobileNav from '../components/MobileNav'
 
 export const revalidate = 60
 
