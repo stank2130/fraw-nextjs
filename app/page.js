@@ -14,7 +14,7 @@ function formatDate(dateStr) {
 
 export default async function HomePage() {
   const [articles, releases, settings] = await Promise.all([
-    getLatestArticles(6),
+    getLatestArticles(9),
     getUpcomingReleases(4),
     getSiteSettings(),
   ])
