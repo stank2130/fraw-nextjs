@@ -102,6 +102,7 @@ export default async function ArticlePage({ params }) {
         .ad-block:hover img { opacity: 0.85; }
         .ad-label { font-family: var(--font-mono); font-size: 11px; color: var(--text); margin-top: 6px; display: block; }
         .article-nav-spread { display: flex; flex: 1; justify-content: space-evenly; padding-left: 10%; padding-right: 5%; }
+        .article-footer { padding: 22px 32px; display: flex; align-items: center; justify-content: space-between; border-top: 0.5px solid var(--border); }
 
         @media (max-width: 1024px) { .article-layout { grid-template-columns: 1fr 240px; gap: 32px; } }
         @media (max-width: 768px) {
@@ -109,6 +110,7 @@ export default async function ArticlePage({ params }) {
           .article-layout { grid-template-columns: 1fr; padding: 32px 20px; gap: 0; }
           .article-sidebar { position: static; margin-top: 48px; padding-top: 48px; border-top: 0.5px solid var(--border); }
           .article-title { font-size: 28px; }
+          .article-footer { flex-direction: column; gap: 8px; align-items: flex-start; padding: 20px; }
         }
       `}</style>
 
@@ -214,6 +216,15 @@ export default async function ArticlePage({ params }) {
           )}
         </aside>
       </div>
+
+      {/* FOOTER */}
+      <footer className="article-footer">
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>F.RAW 阜絡</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <a href="https://www.instagram.com/fraw.tw/" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>Instagram</a>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--hint)' }}>© 2025 F.RAW 阜絡</span>
+        </div>
+      </footer>
     </div>
   )
 }
