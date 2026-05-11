@@ -1,4 +1,5 @@
 import './globals.css'
+import { Analytics } from '@vercel/analytics/react'
 
 export const metadata = {
   title: 'F.RAW 阜絡 — 球鞋媒體',
@@ -10,6 +11,7 @@ export default function RootLayout({ children }) {
     <html lang="zh-Hant">
       <body>
         {children}
+        <Analytics />
       </body>
     </html>
   )
