@@ -30,16 +30,16 @@ export default async function HomePage() {
 
   const cats = settings?.categories || {}
 
-  const catLabel = (key) => {
-    const map = {
-      review: cats.review || '評測',
-      unboxing: cats.unboxing || '開箱',
-      culture: cats.culture || '新聞',
-      release: cats.release || '發售',
-      'brand-story': cats.brandStory || '品牌故事',
-    }
-    return map[key] || key
+const catLabel = (key) => {
+  const map = {
+    review: '評測',
+    unboxing: '開箱',
+    culture: '新聞',
+    release: '發售',
+    'brand-story': '品牌故事',
   }
+  return map[key] || key
+}
 
   const tickerItems = settings?.tickerItems?.length > 0
     ? settings.tickerItems
