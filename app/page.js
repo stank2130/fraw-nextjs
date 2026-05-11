@@ -224,12 +224,17 @@ const catLabel = (key) => {
       </section>
 
       {/* FOOTER */}
-      <footer className="footer-wrap">
-        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
-          {settings?.siteTitle || 'F.RAW 阜絡'}
-        </span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--hint)' }}>© 2025 F.RAW 阜絡</span>
-      </footer>
+<footer className="footer-wrap">
+  <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
+    {settings?.siteTitle || 'F.RAW 阜絡'}
+  </span>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+    <a href="https://www.instagram.com/fraw.tw/" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>
+      Instagram
+    </a>
+    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--hint)' }}>© 2025 F.RAW 阜絡</span>
+  </div>
+</footer>
 
     </div>
   )
