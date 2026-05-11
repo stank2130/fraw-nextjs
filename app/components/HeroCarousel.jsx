@@ -12,7 +12,7 @@ function catLabel(key) {
   const map = {
     review: '評測',
     unboxing: '開箱',
-    culture: '文化',
+    culture: '新聞',
     release: '發售',
     'brand-story': '品牌故事',
   }
@@ -41,6 +41,7 @@ export default function HeroCarousel({ articles }) {
   if (!articles || articles.length === 0) return null
 
   const article = articles[current]
+  const articleHref = `/article/${article.slug?.current}`
 
   return (
     <>
@@ -57,6 +58,7 @@ export default function HeroCarousel({ articles }) {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          cursor: pointer;
         }
         .hero-title {
           font-family: var(--font-serif);
@@ -66,12 +68,15 @@ export default function HeroCarousel({ articles }) {
           letter-spacing: 0.04em;
           margin-bottom: 20px;
           color: var(--text);
+          text-decoration: none;
         }
+        .hero-title:hover { color: var(--accent); }
         .hero-image-wrap {
           background: var(--surface);
           position: relative;
           overflow: hidden;
           min-height: 300px;
+          cursor: pointer;
         }
         .hero-image-wrap img {
           width: 100%;
@@ -79,7 +84,9 @@ export default function HeroCarousel({ articles }) {
           object-fit: cover;
           position: absolute;
           top: 0; left: 0;
+          transition: transform 0.4s ease;
         }
+        .hero-image-wrap:hover img { transform: scale(1.03); }
         .hero-arrow {
           position: absolute;
           top: 50%;
@@ -122,26 +129,28 @@ export default function HeroCarousel({ articles }) {
 
       <section className="hero-grid">
         <div className="hero-text">
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--accent)' }}>封面故事</span>
-              <div style={{ flex: 1, height: '0.5px', background: 'var(--border2)' }}></div>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', border: '0.5px solid var(--border2)', color: 'var(--muted)', padding: '2px 10px' }}>
-                {catLabel(article.category)}
-              </span>
+          <Link href={articleHref} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--accent)' }}>封面故事</span>
+                <div style={{ flex: 1, height: '0.5px', background: 'var(--border2)' }}></div>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', border: '0.5px solid var(--border2)', color: 'var(--muted)', padding: '2px 10px' }}>
+                  {catLabel(article.category)}
+                </span>
+              </div>
+              <h1 className="hero-title">{article.title}</h1>
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: '13px', fontWeight: 300, color: 'var(--text2)', lineHeight: 1.9, maxWidth: '340px', marginBottom: '36px' }}>
+                {article.excerpt}
+              </p>
             </div>
-            <h1 className="hero-title">{article.title}</h1>
-            <p style={{ fontFamily: 'var(--font-serif)', fontSize: '13px', fontWeight: 300, color: 'var(--text2)', lineHeight: 1.9, maxWidth: '340px', marginBottom: '36px' }}>
-              {article.excerpt}
-            </p>
-          </div>
+          </Link>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', letterSpacing: '0.06em' }}>
                 {formatDate(article.publishedAt)}
                 {article.readTime && ` · ${article.readTime} 分鐘`}
               </span>
-              <Link href={`/article/${article.slug?.current}`} style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', borderBottom: '1px solid var(--accent)', paddingBottom: '2px', color: 'var(--text)', textDecoration: 'none' }}>
+              <Link href={articleHref} style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', borderBottom: '1px solid var(--accent)', paddingBottom: '2px', color: 'var(--text)', textDecoration: 'none' }}>
                 閱讀全文 →
               </Link>
             </div>
@@ -155,17 +164,17 @@ export default function HeroCarousel({ articles }) {
           </div>
         </div>
 
-        <div className="hero-image-wrap">
+        <Link href={articleHref} className="hero-image-wrap" style={{ textDecoration: 'none' }}>
           {article.coverImageUrl && (
             <img src={article.coverImageUrl} alt={article.title} />
           )}
           {mounted && articles.length > 1 && (
             <>
-              <button className="hero-arrow hero-arrow-left" onClick={prev}>←</button>
-              <button className="hero-arrow hero-arrow-right" onClick={next}>→</button>
+              <button className="hero-arrow hero-arrow-left" onClick={e => { e.preventDefault(); prev() }}>←</button>
+              <button className="hero-arrow hero-arrow-right" onClick={e => { e.preventDefault(); next() }}>→</button>
             </>
           )}
-        </div>
+        </Link>
       </section>
     </>
   )
