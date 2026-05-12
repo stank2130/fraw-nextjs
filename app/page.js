@@ -129,6 +129,7 @@ const catLabel = (key) => {
             ))}
           </div>
           <MobileNav navItems={navItems} siteTitle={settings?.siteTitle} />
+<SearchBar />
         </div>
       </nav>
 
