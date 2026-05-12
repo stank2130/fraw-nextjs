@@ -3,6 +3,7 @@ import { urlFor } from '../../../lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
 import MobileNav from '../../components/MobileNav'
+import SearchBar from '../../components/SearchBar'
 
 export const revalidate = 60
 
@@ -80,6 +81,7 @@ export default async function CategoryPage({ params }) {
             ))}
           </div>
           <MobileNav navItems={navItems} siteTitle={settings?.siteTitle} />
+<SearchBar />
         </div>
       </nav>
 
