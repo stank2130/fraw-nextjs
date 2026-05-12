@@ -3,6 +3,7 @@ import { urlFor } from '../../lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
 import MobileNav from '../components/MobileNav'
+import SearchBar from '../components/SearchBar'
 
 export const revalidate = 60
 
@@ -85,6 +86,7 @@ export default async function ReleasesPage() {
             ))}
           </div>
           <MobileNav navItems={navItems} siteTitle="F.RAW 阜絡" />
+<SearchBar />
         </div>
       </nav>
 
