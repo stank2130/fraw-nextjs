@@ -116,6 +116,11 @@ export default function SearchBar() {
             ) : (
               <div className="search-empty">找不到相關文章</div>
             )}
+            {results.length > 0 && (
+              <Link href={`/search?q=${encodeURIComponent(query)}`} onClick={() => { setOpen(false); setQuery(''); setResults([]) }} style={{ display: 'block', padding: '10px 16px', fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', textDecoration: 'none', borderTop: '0.5px solid var(--border)', textAlign: 'center' }}>
+                查看全部結果 →
+              </Link>
+            )}
           </div>
         )}
       </div>
