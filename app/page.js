@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import HeroCarousel from './components/HeroCarousel'
 import MobileNav from './components/MobileNav'
+import SearchBar from './components/SearchBar'
 
 export const revalidate = 60
 
