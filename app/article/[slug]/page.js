@@ -3,6 +3,7 @@ import { getArticleBySlug, getAllArticleSlugs, getRelatedArticles, getSiteSettin
 import { notFound } from 'next/navigation'
 import InstagramEmbed from '../../components/InstagramEmbed'
 import MobileNav from '../../components/MobileNav'
+import SearchBar from '../../components/SearchBar'
 
 export const revalidate = 60
 
@@ -136,6 +137,7 @@ export default async function ArticlePage({ params }) {
             ))}
           </div>
           <MobileNav navItems={navItems} siteTitle="F.RAW 阜絡" />
+<SearchBar />
         </div>
       </nav>
 
