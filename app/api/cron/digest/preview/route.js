@@ -63,14 +63,37 @@ export async function GET(request) {
 ${allItems.map((it, i) => `[${i}] (${it.source}) ${it.title}\n${it.contentSnippet}`).join('\n\n')}`;
 
   let processed = [];
-  try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    const jsonMatch = text.match(/\[[\s\S]*\]/);
-    processed = JSON.parse(jsonMatch[0]);
-  } catch (err) {
-    console.error('AI parse failed:', err);
+  const modelsToTry = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash'];
+  let lastError = null;
+
+  for (const modelName of modelsToTry) {
+    let success = false;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        processed = JSON.parse(jsonMatch[0]);
+        console.log(`AI success with model: ${modelName}, attempt: ${attempt + 1}`);
+        success = true;
+        break;
+      } catch (err) {
+        lastError = err;
+        console.error(`[${modelName}] attempt ${attempt + 1} failed:`, err.message);
+        // 503 或 429 等一下再試
+        if (err.status === 503 || err.status === 429) {
+          await new Promise((r) => setTimeout(r, 2000));
+        } else {
+          break; // 其他錯就跳出換模型
+        }
+      }
+    }
+    if (success) break;
+  }
+
+  if (processed.length === 0) {
+    console.error('All AI attempts failed:', lastError?.message);
     processed = allItems.map((_, i) => ({
       index: i,
       zhTitle: allItems[i].title,
