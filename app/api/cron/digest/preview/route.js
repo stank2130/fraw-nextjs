@@ -64,7 +64,7 @@ ${allItems.map((it, i) => `[${i}] (${it.source}) ${it.title}\n${it.contentSnippe
 
   let processed = [];
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
     const result = await model.generateContent(prompt);
     const text = result.response.text();
     const jsonMatch = text.match(/\[[\s\S]*\]/);
