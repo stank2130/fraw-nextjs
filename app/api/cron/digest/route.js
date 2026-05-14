@@ -1,7 +1,7 @@
 import Parser from 'rss-parser';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Resend } from 'resend';
-import { SOURCES, RECIPIENTS, SENDER } from '@/lib/sources';
+import { SOURCES, RECIPIENTS, SENDER } from '../../../../lib/sources';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
