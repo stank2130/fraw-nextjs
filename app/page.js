@@ -16,11 +16,12 @@ function formatDate(dateStr) {
 }
 
 export default async function HomePage() {
-  const [articles, releases, settings] = await Promise.all([
-    getLatestArticles(9),
-    getUpcomingReleases(4),
-    getSiteSettings(),
-  ])
+const [articles, releases, settings, totalArticles] = await Promise.all([
+  getLatestArticles(9),
+  getUpcomingReleases(4),
+  getSiteSettings(),
+  getArticleCount(),
+])
 
   const navItems = settings?.navLinks?.length > 0
     ? settings.navLinks
