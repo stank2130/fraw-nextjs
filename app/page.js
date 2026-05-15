@@ -1,3 +1,4 @@
+import StockTicker from './components/StockTicker'
 import { getLatestArticles, getUpcomingReleases, getSiteSettings, getArticleCount } from '../lib/sanity'
 import { urlFor } from '../lib/sanity'
 import Link from 'next/link'
@@ -194,7 +195,7 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-
+<StockTicker />
       {/* FOOTER */}
       <footer className="footer-wrap">
         <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
