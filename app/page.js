@@ -1,3 +1,4 @@
+import ArticleGrid from './components/ArticleGrid'
 import { getLatestArticles, getUpcomingReleases, getSiteSettings } from '../lib/sanity'
 import { urlFor } from '../lib/sanity'
 import Link from 'next/link'
@@ -165,15 +166,7 @@ const catLabel = (key) => {
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>最新文章</span>
         </div>
-        <div className="articles-grid">
-          {articles.map(article => (
-            <Link key={article._id} href={`/article/${article.slug?.current}`} style={{ display: 'block', cursor: 'pointer' }}>
-              <div style={{ width: '100%', aspectRatio: '16/9', background: 'var(--surface2)', marginBottom: '16px', position: 'relative', overflow: 'hidden' }}>
-                {article.coverImage && (
-                  <Image src={urlFor(article.coverImage).width(600).height(338).url()}
-                    alt={article.title} fill style={{ objectFit: 'cover' }} />
-                )}
-              </div>
+<ArticleGrid initialArticles={articles} initialTotal={await getArticleCount()} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--accent)', display: 'block', marginBottom: '8px' }}>
                 {catLabel(article.category)}
               </span>
