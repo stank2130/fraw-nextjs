@@ -1,3 +1,4 @@
+import ImageCarousel from '../../components/ImageCarousel'
 import Link from 'next/link'
 import { getArticleBySlug, getAllArticleSlugs, getRelatedArticles, getSiteSettings, urlFor } from '../../../lib/sanity'
 import { notFound } from 'next/navigation'
@@ -31,6 +32,9 @@ function getYoutubeId(url) {
 }
 
 function renderBlock(block, index) {
+  if (block._type === 'imageGallery') {
+    return <ImageCarousel key={index} images={block.images} urlFor={urlFor} />
+  }
   if (block._type === 'image') {
     return (
       <figure key={index} style={{ margin: '2em 0' }}>
