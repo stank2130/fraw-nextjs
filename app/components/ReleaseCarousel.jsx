@@ -83,12 +83,15 @@ export default function ReleaseCarousel({ releases }) {
         .release-carousel-btn-left { left: -8px; }
         .release-carousel-btn-right { right: -8px; }
         @media (max-width: 768px) {
-          .release-carousel-card { width: 160px; }
-          .release-carousel-btn { display: none; }
-        }
+  .release-carousel-card { width: 160px; }
+  .release-carousel-btn { display: none; }
+  .release-carousel-outer { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .release-carousel-outer::-webkit-scrollbar { display: none; }
+  .release-carousel-track { transition: none; }
+}
       `}</style>
 
-      <div style={{ overflow: 'hidden' }}>
+      <div className="release-carousel-outer" style={{ overflow: 'hidden' }}>
         <div
           className="release-carousel-track"
           style={{ transform: `translateX(-${pos}px)` }}
