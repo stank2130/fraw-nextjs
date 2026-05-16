@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 
-const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 's1wp8h96'
-const DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
+const PROJECT_ID = 's1wp8h96'
+const DATASET = 'production'
 
 function getSanityImageUrl(image) {
   if (!image?.asset?._ref) return null
