@@ -88,25 +88,44 @@ export default function ReleaseCarousel({ releases }) {
         .release-mobile { display: none; }
 
         /* 手機版 */
-        @media (max-width: 768px) {
-          .release-desktop { display: none; }
-          .release-mobile {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            padding-bottom: 8px;
-          }
-          .release-mobile::-webkit-scrollbar { display: none; }
-          .release-mobile-card {
-            flex-shrink: 0;
-            width: 160px;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-          }
-        }
+@media (max-width: 768px) {
+  .release-desktop { display: none; }
+  .release-mobile {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 8px;
+  }
+  .release-mobile::-webkit-scrollbar { display: none; }
+  .release-mobile-card {
+    flex-shrink: 0;
+    width: 160px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .release-mobile-nav {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .release-mobile-btn {
+    background: var(--accent);
+    border: none;
+    color: #000;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+  }
+}
       `}</style>
 
       {/* 桌機版：箭頭輪播 */}
