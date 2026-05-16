@@ -83,111 +83,58 @@ export default function ReleaseCarousel({ releases }) {
         .release-carousel-btn-left { left: -8px; }
         .release-carousel-btn-right { right: -8px; }
 
-        /* 桌機版 */
-        .release-desktop { display: block; }
-        .release-mobile { display: none; }
-
-        /* 手機版 */
-@media (max-width: 768px) {
-  .release-desktop { display: none; }
-  .release-mobile {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 8px;
-  }
-  .release-mobile::-webkit-scrollbar { display: none; }
-  .release-mobile-card {
-    flex-shrink: 0;
-    width: 160px;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-  }
-  .release-mobile-nav {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .release-mobile-btn {
-    background: var(--accent);
-    border: none;
-    color: #000;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 700;
-  }
-}
+        @media (max-width: 768px) {
+          .release-carousel-card { width: 160px; }
+          .release-carousel-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+          }
+          .release-carousel-btn-left { left: -4px; }
+          .release-carousel-btn-right { right: -4px; }
+        }
       `}</style>
 
-      {/* 桌機版：箭頭輪播 */}
-      <div className="release-desktop">
-        <div style={{ overflow: 'hidden' }}>
-          <div
-            className="release-carousel-track"
-            style={{ transform: `translateX(-${pos}px)` }}
-          >
-            {doubled.map((release, idx) => {
-              const imgUrl = getImageUrl(release.image)
-              return (
-                <Link key={idx} href={`/releases/${release.slug?.current}`} className="release-carousel-card">
-                  <div className={`release-carousel-inner${release.hot ? ' hot' : ''}`}>
-                    {release.hot && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }} />}
-                    {release.hot && (
-                      <span style={{ position: 'absolute', top: '8px', right: '8px', fontFamily: 'var(--font-mono)', fontSize: '6px', background: 'var(--accent)', color: 'var(--accent-dark)', padding: '2px 6px', letterSpacing: '0.1em', textTransform: 'uppercase', zIndex: 1 }}>本週強推</span>
+      <div style={{ overflow: 'hidden' }}>
+        <div
+          className="release-carousel-track"
+          style={{ transform: `translateX(-${pos}px)` }}
+        >
+          {doubled.map((release, idx) => {
+            const imgUrl = getImageUrl(release.image)
+            return (
+              <Link key={idx} href={`/releases/${release.slug?.current}`} className="release-carousel-card">
+                <div className={`release-carousel-inner${release.hot ? ' hot' : ''}`}>
+                  {release.hot && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }} />}
+                  {release.hot && (
+                    <span style={{ position: 'absolute', top: '8px', right: '8px', fontFamily: 'var(--font-mono)', fontSize: '6px', background: 'var(--accent)', color: 'var(--accent-dark)', padding: '2px 6px', letterSpacing: '0.1em', textTransform: 'uppercase', zIndex: 1 }}>本週強推</span>
+                  )}
+                  <div style={{ width: '100%', aspectRatio: '1/1', background: 'var(--surface2)', marginBottom: '10px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {imgUrl ? (
+                      <img src={imgUrl} alt={release.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
+                    ) : (
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)' }}>圖片</span>
                     )}
-                    <div style={{ width: '100%', aspectRatio: '1/1', background: 'var(--surface2)', marginBottom: '10px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {imgUrl ? <img src={imgUrl} alt={release.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} /> : <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)' }}>圖片</span>}
-                    </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
-                    <div style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '10px', flexGrow: 1 }}>{release.name}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', color: 'var(--muted)' }}>{release.releaseDate}</span>
-                      {release.price?.amount && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--accent)' }}>{currencySymbol(release.price.currency)}{release.price.amount.toLocaleString()}</span>}
-                    </div>
                   </div>
-                </Link>
-              )
-            })}
-          </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '10px', flexGrow: 1 }}>{release.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', color: 'var(--muted)' }}>{release.releaseDate}</span>
+                    {release.price?.amount && (
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--accent)' }}>
+                        {currencySymbol(release.price.currency)}{release.price.amount.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
         </div>
-        <button className="release-carousel-btn release-carousel-btn-left" onClick={prev}>←</button>
-        <button className="release-carousel-btn release-carousel-btn-right" onClick={next}>→</button>
       </div>
 
-      {/* 手機版：原生滑動 */}
-      <div className="release-mobile">
-        {releases.map((release, idx) => {
-          const imgUrl = getImageUrl(release.image)
-          return (
-            <Link key={idx} href={`/releases/${release.slug?.current}`} className="release-mobile-card">
-              <div className={`release-carousel-inner${release.hot ? ' hot' : ''}`}>
-                {release.hot && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }} />}
-                {release.hot && (
-                  <span style={{ position: 'absolute', top: '8px', right: '8px', fontFamily: 'var(--font-mono)', fontSize: '6px', background: 'var(--accent)', color: 'var(--accent-dark)', padding: '2px 6px', letterSpacing: '0.1em', textTransform: 'uppercase', zIndex: 1 }}>本週強推</span>
-                )}
-                <div style={{ width: '100%', aspectRatio: '1/1', background: 'var(--surface2)', marginBottom: '10px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {imgUrl ? <img src={imgUrl} alt={release.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} /> : <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)' }}>圖片</span>}
-                </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '10px', flexGrow: 1 }}>{release.name}</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', color: 'var(--muted)' }}>{release.releaseDate}</span>
-                  {release.price?.amount && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--accent)' }}>{currencySymbol(release.price.currency)}{release.price.amount.toLocaleString()}</span>}
-                </div>
-              </div>
-            </Link>
-          )
-        })}
-      </div>
+      <button className="release-carousel-btn release-carousel-btn-left" onClick={prev}>←</button>
+      <button className="release-carousel-btn release-carousel-btn-right" onClick={next}>→</button>
     </div>
   )
 }
