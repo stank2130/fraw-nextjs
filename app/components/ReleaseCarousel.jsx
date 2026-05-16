@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 
 export default function ReleaseCarousel({ releases }) {
@@ -35,11 +35,27 @@ export default function ReleaseCarousel({ releases }) {
           display: flex;
           gap: 14px;
           transition: transform 0.4s ease;
+          align-items: stretch;
         }
         .release-carousel-card {
           flex-shrink: 0;
           width: 220px;
           text-decoration: none;
+          display: flex;
+          flex-direction: column;
+        }
+        .release-carousel-inner {
+          background: var(--surface);
+          border: 0.5px solid var(--border);
+          padding: 12px;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+        .release-carousel-inner.hot {
+          background: #0C0B00;
+          border-color: #3A3800;
         }
         .release-carousel-btn {
           position: absolute;
@@ -65,6 +81,7 @@ export default function ReleaseCarousel({ releases }) {
         .release-carousel-btn-right { right: -8px; }
         @media (max-width: 768px) {
           .release-carousel-card { width: 160px; }
+          .release-carousel-btn { display: none; }
         }
       `}</style>
 
@@ -77,28 +94,44 @@ export default function ReleaseCarousel({ releases }) {
             const imgUrl = getImageUrl(release.image)
             return (
               <Link key={release._id} href={`/releases/${release.slug?.current}`} className="release-carousel-card">
-                <div style={{
-                  background: release.hot ? '#0C0B00' : 'var(--surface)',
-                  border: `0.5px solid ${release.hot ? '#3A3800' : 'var(--border)'}`,
-                  padding: '12px', position: 'relative'
-                }}>
-                  {release.hot && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }} />}
-                  <div style={{ width: '100%', aspectRatio: '1/1', background: 'var(--surface2)', marginBottom: '10px', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className={`release-carousel-inner${release.hot ? ' hot' : ''}`}>
+                  {/* 本週強推標籤放右上角 */}
+                  {release.hot && (
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }} />
+                  )}
+                  {release.hot && (
+                    <span style={{
+                      position: 'absolute', top: '8px', right: '8px',
+                      fontFamily: 'var(--font-mono)', fontSize: '6px',
+                      background: 'var(--accent)', color: 'var(--accent-dark)',
+                      padding: '2px 6px', letterSpacing: '0.1em', textTransform: 'uppercase',
+                      zIndex: 1
+                    }}>本週強推</span>
+                  )}
+
+                  {/* 圖片 */}
+                  <div style={{ width: '100%', aspectRatio: '1/1', background: 'var(--surface2)', marginBottom: '10px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {imgUrl ? (
                       <img src={imgUrl} alt={release.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
                     ) : (
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)' }}>圖片</span>
                     )}
                   </div>
+
+                  {/* 品牌 */}
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
-                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '10px' }}>{release.name}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+                  {/* 名稱 - flex-grow 讓高度一致 */}
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '10px', flexGrow: 1 }}>{release.name}</div>
+
+                  {/* 日期 + 價格 */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', color: 'var(--muted)' }}>{release.releaseDate}</span>
-                    {release.hot ? (
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '6px', background: 'var(--accent)', color: 'var(--accent-dark)', padding: '2px 6px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>本週強推</span>
-                    ) : release.price?.amount ? (
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--accent)' }}>{currencySymbol(release.price.currency)}{release.price.amount.toLocaleString()}</span>
-                    ) : null}
+                    {release.price?.amount && (
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--accent)' }}>
+                        {currencySymbol(release.price.currency)}{release.price.amount.toLocaleString()}
+                      </span>
+                    )}
                   </div>
                 </div>
               </Link>
