@@ -9,8 +9,10 @@ export default function ReleaseCarousel({ releases }) {
   const GAP = 14
   const STEP = CARD_WIDTH + GAP
 
-  const prev = () => setPos(p => Math.max(0, p - STEP * 2))
-  const next = () => setPos(p => p + STEP * 2)
+const total = releases.length
+const maxPos = total * STEP
+const prev = () => setPos(p => (p - STEP * 2 + maxPos) % maxPos)
+const next = () => setPos(p => (p + STEP * 2) % maxPos)
 
   const currencySymbol = (currency) => {
     const map = { USD: '$', TWD: 'NT$', RMB: '¥', JPY: '¥', HKD: 'HK$', EUR: '€', GBP: '£' }
