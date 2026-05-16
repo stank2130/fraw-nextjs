@@ -8,11 +8,10 @@ export default function ReleaseCarousel({ releases }) {
   const CARD_WIDTH = 220
   const GAP = 14
   const STEP = CARD_WIDTH + GAP
+  const maxPos = releases.length * STEP
 
-const total = releases.length
-const maxPos = total * STEP
-const prev = () => setPos(p => (p - STEP * 2 + maxPos) % maxPos)
-const next = () => setPos(p => (p + STEP * 2) % maxPos)
+  const prev = () => setPos(p => (p - STEP * 2 + maxPos) % maxPos)
+  const next = () => setPos(p => (p + STEP * 2) % maxPos)
 
   const currencySymbol = (currency) => {
     const map = { USD: '$', TWD: 'NT$', RMB: '¥', JPY: '¥', HKD: 'HK$', EUR: '€', GBP: '£' }
@@ -29,6 +28,8 @@ const next = () => setPos(p => (p + STEP * 2) % maxPos)
     if (!id) return null
     return `https://cdn.sanity.io/images/${PROJECT_ID}/${DATASET}/${id}-${dimensions}.${format}`
   }
+
+  const doubled = [...releases, ...releases]
 
   return (
     <div style={{ position: 'relative', padding: '0 28px' }}>
@@ -92,12 +93,11 @@ const next = () => setPos(p => (p + STEP * 2) % maxPos)
           className="release-carousel-track"
           style={{ transform: `translateX(-${pos}px)` }}
         >
-          {releases.map(release => {
+          {doubled.map((release, idx) => {
             const imgUrl = getImageUrl(release.image)
             return (
-              <Link key={release._id} href={`/releases/${release.slug?.current}`} className="release-carousel-card">
+              <Link key={idx} href={`/releases/${release.slug?.current}`} className="release-carousel-card">
                 <div className={`release-carousel-inner${release.hot ? ' hot' : ''}`}>
-                  {/* 本週強推標籤放右上角 */}
                   {release.hot && (
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }} />
                   )}
@@ -110,8 +110,6 @@ const next = () => setPos(p => (p + STEP * 2) % maxPos)
                       zIndex: 1
                     }}>本週強推</span>
                   )}
-
-                  {/* 圖片 */}
                   <div style={{ width: '100%', aspectRatio: '1/1', background: 'var(--surface2)', marginBottom: '10px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {imgUrl ? (
                       <img src={imgUrl} alt={release.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
@@ -119,14 +117,8 @@ const next = () => setPos(p => (p + STEP * 2) % maxPos)
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)' }}>圖片</span>
                     )}
                   </div>
-
-                  {/* 品牌 */}
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
-
-                  {/* 名稱 - flex-grow 讓高度一致 */}
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '10px', flexGrow: 1 }}>{release.name}</div>
-
-                  {/* 日期 + 價格 */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', color: 'var(--muted)' }}>{release.releaseDate}</span>
                     {release.price?.amount && (
