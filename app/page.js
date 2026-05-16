@@ -71,11 +71,6 @@ export default async function HomePage() {
           grid-template-columns: repeat(3, 1fr);
           gap: 24px;
         }
-        .releases-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-        }
         .footer-wrap {
           padding: 22px 32px;
           display: flex;
@@ -87,12 +82,10 @@ export default async function HomePage() {
 
         @media (max-width: 1024px) {
           .articles-grid { grid-template-columns: repeat(2, 1fr); }
-          .releases-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 768px) {
           .nav-links-spread { display: none; }
           .articles-grid { grid-template-columns: 1fr; gap: 28px; }
-          .releases-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
           .section-pad { padding: 28px 20px; }
           .footer-wrap { flex-direction: column; gap: 8px; align-items: flex-start; padding: 20px; }
         }
@@ -162,24 +155,10 @@ export default async function HomePage() {
       {/* RELEASE RADAR */}
       <section className="section-pad" style={{ borderBottom: '0.5px solid var(--border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>發售雷達</span>
-  <Link href="/releases" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', textDecoration: 'none', borderBottom: '1px solid var(--accent)', paddingBottom: '1px' }}>查看全部 →</Link>
-</div>
-        <ReleaseCarousel releases={releases} />
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
-                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '12px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '12px' }}>{release.name}</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--muted)' }}>{release.releaseDate}</span>
-                  {release.hot ? (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '7px', background: 'var(--accent)', color: 'var(--accent-dark)', padding: '2px 7px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>本週強推</span>
-                  ) : release.price?.amount ? (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--accent)' }}>NT${release.price.amount.toLocaleString()}</span>
-                  ) : null}
-                </div>
-              </div>
-            </Link>
-          ))}
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>發售雷達</span>
+          <Link href="/releases" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', textDecoration: 'none', borderBottom: '1px solid var(--accent)', paddingBottom: '1px' }}>查看全部 →</Link>
         </div>
+        <ReleaseCarousel releases={releases} />
       </section>
 
       <StockTicker />
