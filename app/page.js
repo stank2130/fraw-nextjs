@@ -7,6 +7,7 @@ import HeroCarousel from './components/HeroCarousel'
 import MobileNav from './components/MobileNav'
 import SearchBar from './components/SearchBar'
 import ArticleGrid from './components/ArticleGrid'
+import ReleaseCarousel from './components/ReleaseCarousel'
 
 export const revalidate = 60
 
@@ -18,7 +19,7 @@ function formatDate(dateStr) {
 export default async function HomePage() {
   const [articles, releases, settings, totalArticles] = await Promise.all([
     getLatestArticles(9),
-    getUpcomingReleases(4),
+    getUpcomingReleases(10),
     getSiteSettings(),
     getArticleCount(),
   ])
@@ -164,23 +165,7 @@ export default async function HomePage() {
   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>發售雷達</span>
   <Link href="/releases" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--accent)', textDecoration: 'none', borderBottom: '1px solid var(--accent)', paddingBottom: '1px' }}>查看全部 →</Link>
 </div>
-        <div className="releases-grid">
-          {releases.map(release => (
-            <Link key={release._id} href={`/releases/${release.slug?.current}`} style={{ display: 'block', textDecoration: 'none' }}>
-              <div style={{
-                background: release.hot ? '#0C0B00' : 'var(--surface)',
-                border: `0.5px solid ${release.hot ? '#3A3800' : 'var(--border)'}`,
-                padding: '14px 13px', position: 'relative'
-              }}>
-                {release.hot && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'var(--accent)' }}></div>}
-                <div style={{ width: '100%', aspectRatio: '4/3', background: 'var(--surface2)', marginBottom: '12px', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {release.image ? (
-                    <Image src={urlFor(release.image).width(300).height(225).url()}
-                      alt={release.name} fill style={{ objectFit: 'contain', padding: '8px' }} />
-                  ) : (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--hint)' }}>圖片</span>
-                  )}
-                </div>
+        <ReleaseCarousel releases={releases} />
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>{release.brand}</div>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '12px', fontWeight: 600, lineHeight: 1.4, color: release.hot ? 'var(--accent)' : 'var(--text)', marginBottom: '12px' }}>{release.name}</div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
