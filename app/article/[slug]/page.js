@@ -33,7 +33,7 @@ function getYoutubeId(url) {
 
 function renderBlock(block, index) {
   if (block._type === 'imageGallery') {
-    return <ImageCarousel key={index} images={block.images} urlFor={urlFor} />
+    return <ImageCarousel key={index} images={block.images} />
   }
   if (block._type === 'image') {
     return (
