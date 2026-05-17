@@ -66,7 +66,7 @@ export default async function ArticlePage({ params }) {
   if (!article) notFound()
 
   const related = await getRelatedArticles(article.category, article._id)
-  const youtubeId = getYoutubeId(article.youtubeUrl)
+  const youtubeIds = (article.youtubeUrls || []).map(url => getYoutubeId(url)).filter(Boolean)
   const sidebarAds = settings?.sidebarAds || []
 
   const navItems = settings?.navLinks?.length > 0
@@ -170,19 +170,19 @@ export default async function ArticlePage({ params }) {
             </div>
           )}
 
-          {youtubeId && (
-            <div className="youtube-wrap">
-              <iframe src={`https://www.youtube.com/embed/${youtubeId}`} title={article.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-            </div>
-          )}
+          {youtubeIds.map((id, i) => (
+  <div key={i} className="youtube-wrap">
+    <iframe src={`https://www.youtube.com/embed/${id}`} title={`${article.title} ${i + 1}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+  </div>
+))}
 
-          {article.instagramUrl && (
-            <div className="ig-wrap"><InstagramEmbed url={article.instagramUrl} type="post" /></div>
-          )}
+{(article.instagramUrls || []).map((url, i) => (
+  <div key={i} className="ig-wrap"><InstagramEmbed url={url} type="post" /></div>
+))}
 
-          {article.instagramReelUrl && (
-            <div className="ig-wrap"><InstagramEmbed url={article.instagramReelUrl} type="reel" /></div>
-          )}
+{(article.instagramReelUrls || []).map((url, i) => (
+  <div key={i} className="ig-wrap"><InstagramEmbed url={url} type="reel" /></div>
+))}
 
           <div>{article.body?.map((block, i) => renderBlock(block, i))}</div>
 
