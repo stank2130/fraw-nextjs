@@ -35,6 +35,24 @@ function renderBlock(block, index) {
   if (block._type === 'imageGallery') {
     return <ImageCarousel key={index} images={block.images} />
   }
+  if (block._type === 'youtubeEmbed') {
+    const match = block.url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
+    const id = match ? match[1] : null
+    if (!id) return null
+    return (
+      <div key={index} className="youtube-wrap">
+        <iframe src={`https://www.youtube.com/embed/${id}`} title={`YouTube ${index}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+      </div>
+    )
+  }
+  if (block._type === 'instagramEmbed') {
+    if (!block.url) return null
+    return (
+      <div key={index} className="ig-wrap">
+        <InstagramEmbed url={block.url} type={block.type || 'post'} />
+      </div>
+    )
+  }
   if (block._type === 'image') {
     return (
       <figure key={index} style={{ margin: '2em 0' }}>
