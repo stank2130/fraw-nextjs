@@ -9,7 +9,6 @@ export const dynamic = 'force-dynamic';
 const HOURS_BACK = 24;
 
 export async function GET(request) {
-  // 驗證:必須帶正確的 secret
   const auth = request.headers.get('authorization');
   if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response('Unauthorized', { status: 401 });
@@ -22,7 +21,6 @@ export async function GET(request) {
   const cutoff = Date.now() - HOURS_BACK * 60 * 60 * 1000;
   const allItems = [];
 
-  // 抓所有 RSS
   for (const source of SOURCES) {
     try {
       const feed = await parser.parseURL(source.url);
@@ -51,7 +49,6 @@ export async function GET(request) {
     return Response.json({ ok: true, message: 'No new items', count: 0 });
   }
 
-  // 用 Gemini 一次處理全部
   const prompt = `你是球鞋媒體 F.RAW 的素材編輯。下面是今天從各來源抓到的 ${allItems.length} 則內容。
 
 請幫每則做:
@@ -59,6 +56,7 @@ export async function GET(request) {
 2. 一句話摘要(40 字內)
 3. 分類:release(發售) / sneaker(球鞋新聞) / brand(品牌動態) / culture(文化/聯名)
 4. 重要度:high / medium / low(依台灣讀者興趣判斷,Nike/adidas/聯名款/限量款優先)
+5. 若內容與球鞋、跑鞋、時尚、運動完全無關(例如美食、手錶、影劇),重要度設為 low
 
 只輸出 JSON 陣列,不要加任何前後說明文字、不要加 markdown 程式碼框,格式:
 [{"index":0,"zhTitle":"...","summary":"...","category":"...","priority":"..."}]
@@ -106,11 +104,19 @@ ${allItems.map((it, i) => `[${i}] (${it.source}) ${it.title}\n${it.contentSnippe
     }));
   }
 
-  const enriched = processed.map((p) => ({ ...allItems[p.index], ...p }));
+  // 來源強制分類:跑步來源一律歸 running
+  const enriched = processed.map((p) => {
+    const item = { ...allItems[p.index], ...p };
+    if (item.type === 'running') {
+      item.category = 'running';
+    }
+    return item;
+  });
 
   const groups = {
     release: enriched.filter((x) => x.category === 'release').sort(byPriority),
     sneaker: enriched.filter((x) => x.category === 'sneaker').sort(byPriority),
+    running: enriched.filter((x) => x.category === 'running').sort(byPriority),
     brand: enriched.filter((x) => x.category === 'brand').sort(byPriority),
     culture: enriched.filter((x) => x.category === 'culture').sort(byPriority),
   };
@@ -159,6 +165,7 @@ function renderEmail(groups) {
       <div style="color:#888;font-size:13px;margin-bottom:8px;">${new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' })}</div>
       ${section('🔥 發售情報', groups.release, '#E8F03C')}
       ${section('👟 球鞋新聞', groups.sneaker, '#E8F03C')}
+      ${section('🏃 跑步 / 機能', groups.running, '#E8F03C')}
       ${section('🏷️ 品牌動態', groups.brand, '#E8F03C')}
       ${section('🎨 文化 / 聯名', groups.culture, '#E8F03C')}
       <div style="margin-top:32px;padding-top:16px;border-top:1px solid #333;color:#666;font-size:12px;">
