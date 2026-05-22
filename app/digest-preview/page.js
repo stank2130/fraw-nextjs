@@ -30,6 +30,7 @@ export default function DigestPreview() {
   const groups = data?.items ? {
     release: data.items.filter(x => x.category === 'release'),
     sneaker: data.items.filter(x => x.category === 'sneaker'),
+    running: data.items.filter(x => x.category === 'running'),
     brand: data.items.filter(x => x.category === 'brand'),
     culture: data.items.filter(x => x.category === 'culture'),
   } : null;
@@ -92,6 +93,7 @@ export default function DigestPreview() {
             {groups && Object.entries({
               '🔥 發售情報': groups.release,
               '👟 球鞋新聞': groups.sneaker,
+              '🏃 跑步 / 機能': groups.running,
               '🏷️ 品牌動態': groups.brand,
               '🎨 文化 / 聯名': groups.culture,
             }).map(([title, items]) => items.length > 0 && (
