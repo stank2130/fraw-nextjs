@@ -81,11 +81,10 @@ ${allItems.map((it, i) => `[${i}] (${it.source}) ${it.title}\n${it.contentSnippe
       } catch (err) {
         lastError = err;
         console.error(`[${modelName}] attempt ${attempt + 1} failed:`, err.message);
-        // 503 或 429 等一下再試
         if (err.status === 503 || err.status === 429) {
           await new Promise((r) => setTimeout(r, 2000));
         } else {
-          break; // 其他錯就跳出換模型
+          break;
         }
       }
     }
