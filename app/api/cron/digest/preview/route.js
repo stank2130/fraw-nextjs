@@ -53,7 +53,7 @@ export async function GET(request) {
 請幫每則做:
 1. 中文標題(20 字內,直接、不要農場標)
 2. 一句話摘要(40 字內)
-3. 分類:release(發售) / sneaker(球鞋新聞) / brand(品牌動態) / culture(文化/聯名)
+3. 分類:release(發售) / sneaker(球鞋新聞) / running(跑步/機能鞋) / brand(品牌動態) / culture(文化/聯名)。跑步鞋、競速鞋、碳板鞋、機能慢跑鞋一律歸 running
 4. 重要度:high / medium / low(依台灣讀者興趣判斷,Nike/adidas/聯名款/限量款優先)
 
 只輸出 JSON 陣列,不要加任何前後說明文字、不要加 markdown 程式碼框,格式:
