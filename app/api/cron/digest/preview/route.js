@@ -28,7 +28,7 @@ export async function GET(request) {
           const date = new Date(item.pubDate || item.isoDate).getTime();
           return date > cutoff;
         })
-        .slice(0, 5)
+        .slice(0, source.type === 'running' ? 10 : 5)
         .map((item) => ({
           source: source.name,
           lang: source.lang,
