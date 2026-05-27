@@ -213,12 +213,14 @@ export default async function ArticlePage({ params }) {
           {sidebarAds.length > 0 && (
             <div className="sidebar-section">
               <span className="sidebar-label">推薦好物</span>
-              {sidebarAds.map((ad, i) => (
-                <a key={i} href={ad.url} target="_blank" rel="noopener noreferrer sponsored" className="ad-block">
-                  {ad.image && <img src={urlFor(ad.image).width(280).height(280).url()} alt={ad.label || '廣告'} />}
-                  {ad.label && <span className="ad-label">{ad.label}</span>}
-                </a>
-              ))}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+  {sidebarAds.map((ad, i) => (
+    <a key={i} href={ad.url} target="_blank" rel="noopener noreferrer sponsored" style={{ display: 'block', textDecoration: 'none' }}>
+      {ad.image && <img src={urlFor(ad.image).width(140).height(140).url()} alt={ad.label || '廣告'} style={{ width: '100%', height: 'auto', display: 'block' }} />}
+      {ad.label && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--text)', marginTop: '4px', display: 'block', lineHeight: 1.3 }}>{ad.label}</span>}
+    </a>
+  ))}
+</div>
             </div>
           )}
 
