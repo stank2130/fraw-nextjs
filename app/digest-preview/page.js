@@ -5,6 +5,8 @@ import { useState } from 'react';
 export default function DigestPreview() {
   const [secret, setSecret] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState('');
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
 
@@ -12,6 +14,7 @@ export default function DigestPreview() {
     setLoading(true);
     setError('');
     setData(null);
+    setSendResult('');
     try {
       const res = await fetch(`/api/cron/digest/preview?key=${encodeURIComponent(secret)}`);
       if (!res.ok) {
@@ -25,6 +28,29 @@ export default function DigestPreview() {
       setError(e.message);
     }
     setLoading(false);
+  }
+
+  async function sendEmail() {
+    if (!confirm('確定要立刻寄出一封 email 嗎?')) return;
+    setSending(true);
+    setSendResult('');
+    try {
+      const res = await fetch(`/api/cron/digest?key=${encodeURIComponent(secret)}`);
+      if (!res.ok) {
+        setSendResult(`❌ 寄信失敗:${res.status} ${res.statusText}`);
+        setSending(false);
+        return;
+      }
+      const json = await res.json();
+      if (json.ok) {
+        setSendResult(`✅ 已寄出,共 ${json.count} 則`);
+      } else {
+        setSendResult(`⚠️ 沒寄出:${json.message || '未知原因'}`);
+      }
+    } catch (e) {
+      setSendResult(`❌ 寄信失敗:${e.message}`);
+    }
+    setSending(false);
   }
 
   const groups = data?.items ? {
@@ -51,14 +77,14 @@ export default function DigestPreview() {
           這頁只給你看,不會寄出 email。輸入 CRON_SECRET 後點按鈕抓取最新內容。
         </p>
 
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
           <input
             type="password"
             placeholder="貼上 CRON_SECRET"
             value={secret}
             onChange={(e) => setSecret(e.target.value)}
             style={{
-              flex: 1, padding: '10px 12px', background: '#1a1a1a',
+              flex: 1, minWidth: 200, padding: '10px 12px', background: '#1a1a1a',
               border: '1px solid #333', color: '#fff', borderRadius: 4,
             }}
           />
@@ -72,7 +98,28 @@ export default function DigestPreview() {
           >
             {loading ? '抓取中...' : '預覽'}
           </button>
+          <button
+            onClick={sendEmail}
+            disabled={sending || !secret}
+            style={{
+              padding: '10px 20px', background: '#1a1a1a', color: '#E8F03C',
+              border: '1px solid #E8F03C', borderRadius: 4, cursor: 'pointer', fontWeight: 'bold',
+            }}
+            title="會立刻寄一封 email 給收件人清單"
+          >
+            {sending ? '寄送中...' : '✉️ 寄出 Email'}
+          </button>
         </div>
+
+        {sendResult && (
+          <div style={{
+            padding: 12, marginBottom: 16, borderRadius: 4,
+            background: sendResult.startsWith('✅') ? '#102a10' : '#2a1010',
+            color: sendResult.startsWith('✅') ? '#86efac' : '#ff6b6b',
+          }}>
+            {sendResult}
+          </div>
+        )}
 
         {loading && (
           <div style={{ color: '#888' }}>抓取 RSS + AI 摘要中,大約 30-60 秒...</div>
