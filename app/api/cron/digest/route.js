@@ -10,7 +10,13 @@ const HOURS_BACK = 24;
 
 export async function GET(request) {
   const auth = request.headers.get('authorization');
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  const { searchParams } = new URL(request.url);
+  const keyParam = searchParams.get('key');
+
+  const validAuth = auth === `Bearer ${process.env.CRON_SECRET}`;
+  const validKey = keyParam === process.env.CRON_SECRET;
+
+  if (!validAuth && !validKey) {
     return new Response('Unauthorized', { status: 401 });
   }
 
