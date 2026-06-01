@@ -119,6 +119,28 @@ export default async function ArticlePage({ params }) {
   const youtubeIds = (article.youtubeUrls || []).map(url => getYoutubeId(url)).filter(Boolean)
   const sidebarAds = settings?.sidebarAds || []
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description: article.excerpt || '',
+    image: article.coverImage
+      ? [urlFor(article.coverImage).width(1200).height(630).fit('crop').url()]
+      : [],
+    datePublished: article.publishedAt,
+    dateModified: article._updatedAt || article.publishedAt,
+    author: { '@type': 'Person', name: article.author || 'F.RAW 阜絡' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'F.RAW 阜絡',
+      logo: { '@type': 'ImageObject', url: 'https://fraw.tw/logo.png' },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://fraw.tw/article/${slug}`,
+    },
+  }
+
   const navItems = settings?.navLinks?.length > 0
     ? settings.navLinks
     : [
@@ -130,6 +152,10 @@ export default async function ArticlePage({ params }) {
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <style>{`
         .article-layout {
           max-width: 1200px;
