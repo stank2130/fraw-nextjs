@@ -133,7 +133,6 @@ export default async function ArticlePage({ params }) {
     publisher: {
       '@type': 'Organization',
       name: 'F.RAW 阜絡',
-      logo: { '@type': 'ImageObject', url: 'https://fraw.tw/logo.png' },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
