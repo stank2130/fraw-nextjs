@@ -17,7 +17,39 @@ export async function generateMetadata({ params }) {
   const { slug } = await params
   const article = await getArticleBySlug(slug)
   if (!article) return {}
-  return { title: `${article.title} — F.RAW 阜絡` }
+
+  const firstText = article.body?.find(b => b._type === 'block')
+    ?.children?.map(c => c.text).join('') || ''
+  const description = (
+    article.excerpt || firstText || '深入球鞋文化的核心——發售、評測、品牌故事。'
+  ).slice(0, 155)
+
+  const ogImage = article.coverImage
+    ? urlFor(article.coverImage).width(1200).height(630).fit('crop').url()
+    : null
+
+  const url = `https://fraw.tw/article/${slug}`
+
+  return {
+    title: `${article.title} — F.RAW 阜絡`,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: article.title,
+      description,
+      url,
+      type: 'article',
+      siteName: 'F.RAW 阜絡',
+      publishedTime: article.publishedAt,
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630 }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description,
+      images: ogImage ? [ogImage] : [],
+    },
+  }
 }
 
 function formatDate(dateStr) {
