@@ -41,7 +41,7 @@ export async function GET(request) {
           lang: source.lang,
           type: source.type,
           title: item.title,
-          link: item.link,
+          link: resolveGoogleNewsLink(item.link),
           pubDate: item.pubDate || item.isoDate,
           contentSnippet: (item.contentSnippet || item.content || '').slice(0, 500),
         }));
@@ -179,4 +179,20 @@ function renderEmail(groups) {
       </div>
     </div>
   `;
+}
+function resolveGoogleNewsLink(link) {
+  if (!link || !link.includes('news.google.com')) return link;
+  try {
+    const match = link.match(/\/articles\/([^?/]+)/);
+    if (!match) return link;
+    const encoded = match[1];
+    const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
+    const urlMatch = decoded.match(/https?:\/\/[^\s\u0000-\u001f"]+/);
+    if (urlMatch) {
+      return urlMatch[0];
+    }
+    return link;
+  } catch (e) {
+    return link;
+  }
 }
