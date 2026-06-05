@@ -20,17 +20,16 @@ export async function GET(request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const parser = new Parser({ timeout: 15000 });
+const parser = new Parser({ timeout: 10000 });
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const cutoff = Date.now() - HOURS_BACK * 60 * 60 * 1000;
-  const allItems = [];
 
-  for (const source of SOURCES) {
-    try {
+  // 平行抓所有 RSS,每個來源最多等 10 秒
+  const results = await Promise.allSettled(
+    SOURCES.map(async (source) => {
       const feed = await parser.parseURL(source.url);
-      const items = feed.items
+      return feed.items
         .filter((item) => {
           const date = new Date(item.pubDate || item.isoDate).getTime();
           return date > cutoff;
@@ -45,11 +44,17 @@ export async function GET(request) {
           pubDate: item.pubDate || item.isoDate,
           contentSnippet: (item.contentSnippet || item.content || '').slice(0, 500),
         }));
-      allItems.push(...items);
-    } catch (err) {
-      console.error(`[${source.name}] failed:`, err.message);
+    })
+  );
+
+  const allItems = [];
+  results.forEach((result, i) => {
+    if (result.status === 'fulfilled') {
+      allItems.push(...result.value);
+    } else {
+      console.error(`[${SOURCES[i].name}] failed:`, result.reason?.message);
     }
-  }
+  });
 
   if (allItems.length === 0) {
     return Response.json({ ok: true, message: 'No new items', count: 0 });
