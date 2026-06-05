@@ -34,7 +34,7 @@ export async function GET(request) {
           lang: source.lang,
           type: source.type,
           title: item.title,
-          link: item.link,
+          link: resolveGoogleNewsLink(item.link),
           pubDate: item.pubDate || item.isoDate,
           contentSnippet: (item.contentSnippet || item.content || '').slice(0, 500),
         }));
@@ -105,4 +105,24 @@ ${allItems.map((it, i) => `[${i}] (${it.source}) ${it.title}\n${it.contentSnippe
   const enriched = processed.map((p) => ({ ...allItems[p.index], ...p }));
 
   return Response.json({ ok: true, count: enriched.length, items: enriched });
+}
+// 把 Google News 包裝過的網址解出原文網址
+function resolveGoogleNewsLink(link) {
+  if (!link || !link.includes('news.google.com')) return link;
+  try {
+    // 從 URL 路徑中抽出 base64 編碼的部分
+    const match = link.match(/\/articles\/([^?/]+)/);
+    if (!match) return link;
+    const encoded = match[1];
+    // Base64 decode
+    const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
+    // 在解碼後的字串中找原文網址(http 開頭)
+    const urlMatch = decoded.match(/https?:\/\/[^\s\u0000-\u001f"]+/);
+    if (urlMatch) {
+      return urlMatch[0];
+    }
+    return link;
+  } catch (e) {
+    return link;
+  }
 }
