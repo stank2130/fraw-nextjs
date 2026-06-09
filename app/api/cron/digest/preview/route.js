@@ -1,6 +1,7 @@
 import Parser from 'rss-parser';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { SOURCES } from '../../../../../lib/sources';
+import { Resend } from 'resend';
+import { SOURCES, RECIPIENTS, SENDER } from '../../../../lib/sources';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -8,18 +9,23 @@ export const dynamic = 'force-dynamic';
 const HOURS_BACK = 24;
 
 export async function GET(request) {
+  const auth = request.headers.get('authorization');
   const { searchParams } = new URL(request.url);
-  const key = searchParams.get('key');
-  if (key !== process.env.CRON_SECRET) {
+  const keyParam = searchParams.get('key');
+
+  const validAuth = auth === `Bearer ${process.env.CRON_SECRET}`;
+  const validKey = keyParam === process.env.CRON_SECRET;
+
+  if (!validAuth && !validKey) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-const parser = new Parser({ timeout: 10000 });
+  const parser = new Parser({ timeout: 10000 });
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const cutoff = Date.now() - HOURS_BACK * 60 * 60 * 1000;
 
-  // 平行抓所有 RSS,每個來源最多等 10 秒
   const results = await Promise.allSettled(
     SOURCES.map(async (source) => {
       const feed = await parser.parseURL(source.url);
@@ -51,7 +57,7 @@ const parser = new Parser({ timeout: 10000 });
   });
 
   if (allItems.length === 0) {
-    return Response.json({ ok: true, message: '過去 24 小時沒有新內容', count: 0, items: [] });
+    return Response.json({ ok: true, message: 'No new items', count: 0 });
   }
 
   const prompt = `你是球鞋媒體 F.RAW 的素材編輯。下面是今天從各來源抓到的 ${allItems.length} 則內容。
@@ -59,8 +65,9 @@ const parser = new Parser({ timeout: 10000 });
 請幫每則做:
 1. 中文標題(20 字內,直接、不要農場標)
 2. 一句話摘要(40 字內)
-3. 分類:release(發售) / sneaker(球鞋新聞) / running(跑步/機能鞋) / brand(品牌動態) / culture(文化/聯名)。跑步鞋、競速鞋、碳板鞋、機能慢跑鞋一律歸 running
+3. 分類:release(發售) / sneaker(球鞋新聞) / brand(品牌動態) / culture(文化/聯名)
 4. 重要度:high / medium / low(依台灣讀者興趣判斷,Nike/adidas/聯名款/限量款優先)
+5. 若內容與球鞋、跑鞋、時尚、運動完全無關(例如美食、手錶、影劇),重要度設為 low
 
 只輸出 JSON 陣列,不要加任何前後說明文字、不要加 markdown 程式碼框,格式:
 [{"index":0,"zhTitle":"...","summary":"...","category":"...","priority":"..."}]
@@ -102,27 +109,53 @@ ${allItems.map((it, i) => `[${i}] (${it.source}) ${it.title}\n${it.contentSnippe
     processed = allItems.map((_, i) => ({
       index: i,
       zhTitle: allItems[i].title,
-      summary: '(AI 摘要失敗,顯示原標題)',
+      summary: '',
       category: 'sneaker',
       priority: 'medium',
     }));
   }
 
-  const enriched = processed.map((p) => ({ ...allItems[p.index], ...p }));
+  const enriched = processed.map((p) => {
+    const item = { ...allItems[p.index], ...p };
+    if (item.type === 'running') {
+      item.category = 'running';
+    }
+    return item;
+  });
 
-  return Response.json({ ok: true, count: enriched.length, items: enriched });
+  const groups = {
+    release: enriched.filter((x) => x.category === 'release').sort(byPriority),
+    sneaker: enriched.filter((x) => x.category === 'sneaker').sort(byPriority),
+    running: enriched.filter((x) => x.category === 'running').sort(byPriority),
+    brand: enriched.filter((x) => x.category === 'brand').sort(byPriority),
+    culture: enriched.filter((x) => x.category === 'culture').sort(byPriority),
+  };
+
+  const html = renderEmail(groups);
+  const today = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
+
+  await resend.emails.send({
+    from: SENDER,
+    to: RECIPIENTS,
+    subject: `F.RAW 素材日報 ${today}(${enriched.length} 則)`,
+    html,
+  });
+
+  return Response.json({ ok: true, count: enriched.length });
 }
-// 把 Google News 包裝過的網址解出原文網址
+
+function byPriority(a, b) {
+  const order = { high: 0, medium: 1, low: 2 };
+  return order[a.priority] - order[b.priority];
+}
+
 function resolveGoogleNewsLink(link) {
   if (!link || !link.includes('news.google.com')) return link;
   try {
-    // 從 URL 路徑中抽出 base64 編碼的部分
     const match = link.match(/\/articles\/([^?/]+)/);
     if (!match) return link;
     const encoded = match[1];
-    // Base64 decode
     const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
-    // 在解碼後的字串中找原文網址(http 開頭)
     const urlMatch = decoded.match(/https?:\/\/[^\s\u0000-\u001f"]+/);
     if (urlMatch) {
       return urlMatch[0];
@@ -131,4 +164,40 @@ function resolveGoogleNewsLink(link) {
   } catch (e) {
     return link;
   }
+}
+
+function renderEmail(groups) {
+  const section = (title, items, color) => {
+    if (items.length === 0) return '';
+    return `
+      <h2 style="color:${color};border-bottom:2px solid ${color};padding-bottom:8px;margin-top:32px;font-family:'Noto Serif TC',serif;">${title}(${items.length})</h2>
+      ${items
+        .map(
+          (it) => `
+        <div style="margin:16px 0;padding:12px;background:#1a1a1a;border-left:3px solid ${it.priority === 'high' ? '#E8F03C' : '#444'};">
+          <div style="font-size:12px;color:#888;margin-bottom:4px;">${it.source} · ${it.priority?.toUpperCase() || ''}</div>
+          <div style="font-size:16px;color:#fff;font-weight:bold;margin-bottom:6px;">${it.zhTitle}</div>
+          <div style="font-size:14px;color:#ccc;margin-bottom:8px;">${it.summary}</div>
+          <a href="${it.link}" style="font-size:12px;color:#E8F03C;text-decoration:none;">原文連結 →</a>
+        </div>
+      `
+        )
+        .join('')}
+    `;
+  };
+
+  return `
+    <div style="background:#0A0A0A;padding:24px;font-family:-apple-system,sans-serif;color:#fff;max-width:680px;margin:0 auto;">
+      <h1 style="color:#E8F03C;font-family:'Noto Serif TC',serif;margin:0 0 8px 0;">F.RAW 素材日報</h1>
+      <div style="color:#888;font-size:13px;margin-bottom:8px;">${new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' })}</div>
+      ${section('🔥 發售情報', groups.release, '#E8F03C')}
+      ${section('👟 球鞋新聞', groups.sneaker, '#E8F03C')}
+      ${section('🏃 跑步 / 機能', groups.running, '#E8F03C')}
+      ${section('🏷️ 品牌動態', groups.brand, '#E8F03C')}
+      ${section('🎨 文化 / 聯名', groups.culture, '#E8F03C')}
+      <div style="margin-top:32px;padding-top:16px;border-top:1px solid #333;color:#666;font-size:12px;">
+        F.RAW 阜絡 · fraw.tw
+      </div>
+    </div>
+  `;
 }
