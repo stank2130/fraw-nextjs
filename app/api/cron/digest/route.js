@@ -20,12 +20,12 @@ export async function GET(request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-const parser = new Parser({ timeout: 10000 });
+  const parser = new Parser({ timeout: 10000 });
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const cutoff = Date.now() - HOURS_BACK * 60 * 60 * 1000;
 
-  // 平行抓所有 RSS,每個來源最多等 10 秒
   const results = await Promise.allSettled(
     SOURCES.map(async (source) => {
       const feed = await parser.parseURL(source.url);
@@ -115,7 +115,6 @@ ${allItems.map((it, i) => `[${i}] (${it.source}) ${it.title}\n${it.contentSnippe
     }));
   }
 
-  // 來源強制分類:跑步來源一律歸 running
   const enriched = processed.map((p) => {
     const item = { ...allItems[p.index], ...p };
     if (item.type === 'running') {
@@ -148,6 +147,23 @@ ${allItems.map((it, i) => `[${i}] (${it.source}) ${it.title}\n${it.contentSnippe
 function byPriority(a, b) {
   const order = { high: 0, medium: 1, low: 2 };
   return order[a.priority] - order[b.priority];
+}
+
+function resolveGoogleNewsLink(link) {
+  if (!link || !link.includes('news.google.com')) return link;
+  try {
+    const match = link.match(/\/articles\/([^?/]+)/);
+    if (!match) return link;
+    const encoded = match[1];
+    const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
+    const urlMatch = decoded.match(/https?:\/\/[^\s\u0000-\u001f"]+/);
+    if (urlMatch) {
+      return urlMatch[0];
+    }
+    return link;
+  } catch (e) {
+    return link;
+  }
 }
 
 function renderEmail(groups) {
@@ -184,20 +200,4 @@ function renderEmail(groups) {
       </div>
     </div>
   `;
-}
-function resolveGoogleNewsLink(link) {
-  if (!link || !link.includes('news.google.com')) return link;
-  try {
-    const match = link.match(/\/articles\/([^?/]+)/);
-    if (!match) return link;
-    const encoded = match[1];
-    const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
-    const urlMatch = decoded.match(/https?:\/\/[^\s\u0000-\u001f"]+/);
-    if (urlMatch) {
-      return urlMatch[0];
-    }
-    return link;
-  } catch (e) {
-    return link;
-  }
 }
