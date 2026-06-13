@@ -10,6 +10,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="zh-Hant">
       <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7625608357926380"
+          crossOrigin="anonymous"
+        />
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-8RV00LW052"
@@ -24,12 +29,6 @@ export default function RootLayout({ children }) {
             gtag('js', new Date());
             gtag('config', 'G-8RV00LW052');
           `}}
-        />
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7625608357926380"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
       </head>
       <body>
