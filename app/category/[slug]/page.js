@@ -1,4 +1,5 @@
-import { getArticlesByCategory, getSiteSettings } from '../../../lib/sanity'import { urlFor } from '../../../lib/sanity'
+import { getArticlesByCategory, getSiteSettings } from '../../../lib/sanity'
+import { urlFor } from '../../../lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
 import MobileNav from '../../components/MobileNav'
@@ -20,10 +21,11 @@ const categoryMap = {
 }
 
 export default async function CategoryPage({ params }) {
-const [articles, settings] = await Promise.all([
-  getArticlesByCategory(slug),
-  getSiteSettings(),
-])
+  const { slug } = await params
+  const [articles, settings] = await Promise.all([
+    getArticlesByCategory(slug),
+    getSiteSettings(),
+  ])
   const label = categoryMap[slug] || slug
 
   const navItems = settings?.navLinks?.length > 0
@@ -77,7 +79,7 @@ const [articles, settings] = await Promise.all([
             ))}
           </div>
           <MobileNav navItems={navItems} siteTitle={settings?.siteTitle} />
-<SearchBar />
+          <SearchBar />
         </div>
       </nav>
 
@@ -116,8 +118,8 @@ const [articles, settings] = await Promise.all([
         )}
       </section>
 
-{/* FOOTER */}
-      <footer className="footer-wrap">
+      {/* FOOTER */}
+      <footer className="cat-footer">
         <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
           {settings?.siteTitle || 'F.RAW 阜絡'}
         </span>
@@ -137,7 +139,7 @@ const [articles, settings] = await Promise.all([
             </svg>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase' }}>聯絡我們</span>
           </a>
-<Link href="/about" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>關於我們</Link>
+          <Link href="/about" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>關於我們</Link>
           <Link href="/privacy" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>隱私權政策</Link>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--hint)' }}>© 2025 F.RAW 阜絡</span>
         </div>
