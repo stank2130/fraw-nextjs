@@ -1,5 +1,4 @@
-import { getLatestArticles, getSiteSettings } from '../../../lib/sanity'
-import { urlFor } from '../../../lib/sanity'
+import { getArticlesByCategory, getSiteSettings } from '../../../lib/sanity'import { urlFor } from '../../../lib/sanity'
 import Link from 'next/link'
 import Image from 'next/image'
 import MobileNav from '../../components/MobileNav'
@@ -21,13 +20,10 @@ const categoryMap = {
 }
 
 export default async function CategoryPage({ params }) {
-  const { slug } = await params
-  const [allArticles, settings] = await Promise.all([
-    getLatestArticles(50),
-    getSiteSettings(),
-  ])
-
-  const articles = allArticles.filter(a => a.category === slug)
+const [articles, settings] = await Promise.all([
+  getArticlesByCategory(slug),
+  getSiteSettings(),
+])
   const label = categoryMap[slug] || slug
 
   const navItems = settings?.navLinks?.length > 0
