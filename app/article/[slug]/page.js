@@ -64,16 +64,15 @@ function getYoutubeId(url) {
 }
 
 function renderInline(child, i) {
-  let content = child.text
-  if (!content) return null
+  if (!child.text) return null
   const marks = child.marks || []
-  if (marks.includes('strong')) content = <strong key={i}>{content}</strong>
-  else if (marks.includes('em')) content = <em key={i}>{content}</em>
-  else if (marks.includes('underline')) content = <u key={i}>{content}</u>
-  else if (marks.includes('strike-through')) content = <s key={i}>{content}</s>
-  else if (marks.includes('code')) content = <code key={i} style={{ fontFamily: 'monospace', background: 'var(--surface)', padding: '2px 6px', fontSize: '13px', borderRadius: '2px' }}>{content}</code>
-  else content = <span key={i}>{content}</span>
-  return content
+  let content = <>{child.text}</>
+  if (marks.includes('code')) content = <code key={i} style={{ fontFamily: 'monospace', background: 'var(--surface)', padding: '2px 6px', fontSize: '13px', borderRadius: '2px' }}>{child.text}</code>
+  if (marks.includes('strong')) content = <strong>{content}</strong>
+  if (marks.includes('em')) content = <em>{content}</em>
+  if (marks.includes('underline')) content = <u>{content}</u>
+  if (marks.includes('strike-through')) content = <s>{content}</s>
+  return <span key={i}>{content}</span>
 }
 
 function renderBlock(block, index) {
