@@ -189,7 +189,7 @@ export default async function ArticlePage({ params }) {
   return (
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <style>{`
+<style>{`
         .article-layout {
           max-width: 1200px;
           margin: 0 auto;
@@ -212,6 +212,8 @@ export default async function ArticlePage({ params }) {
         .related-thumb img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
         .article-nav-spread { display: flex; flex: 1; justify-content: space-evenly; padding-left: 10%; padding-right: 5%; }
         .article-footer { padding: 22px 32px; display: flex; align-items: center; justify-content: space-between; border-top: 0.5px solid var(--border); }
+        article strong { font-weight: 900; color: var(--text); }
+        article em { font-style: italic; color: var(--text2); }
 
         @media (max-width: 1024px) { .article-layout { grid-template-columns: 1fr 240px; gap: 32px; } }
         @media (max-width: 768px) {
