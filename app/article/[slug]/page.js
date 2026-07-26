@@ -63,13 +63,25 @@ function getYoutubeId(url) {
   return match ? match[1] : null
 }
 
+function renderInline(child, i) {
+  let content = child.text
+  if (!content) return null
+  const marks = child.marks || []
+  if (marks.includes('strong')) content = <strong key={i}>{content}</strong>
+  else if (marks.includes('em')) content = <em key={i}>{content}</em>
+  else if (marks.includes('underline')) content = <u key={i}>{content}</u>
+  else if (marks.includes('strike-through')) content = <s key={i}>{content}</s>
+  else if (marks.includes('code')) content = <code key={i} style={{ fontFamily: 'monospace', background: 'var(--surface)', padding: '2px 6px', fontSize: '13px', borderRadius: '2px' }}>{content}</code>
+  else content = <span key={i}>{content}</span>
+  return content
+}
+
 function renderBlock(block, index) {
   if (block._type === 'imageGallery') {
     return <ImageCarousel key={index} images={block.images} />
   }
   if (block._type === 'youtubeEmbed') {
-    const match = block.url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
-    const id = match ? match[1] : null
+    const id = getYoutubeId(block.url)
     if (!id) return null
     return (
       <div key={index} className="youtube-wrap">
@@ -96,13 +108,45 @@ function renderBlock(block, index) {
     )
   }
   if (block._type !== 'block') return null
-  const text = block.children?.map(child => child.text).join('') || ''
-  if (!text) return null
+  if (!block.children?.length) return null
+
+  const children = block.children.map((child, i) => renderInline(child, i))
   const style = block.style || 'normal'
-  if (style === 'h2') return <h2 key={index} style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', fontWeight: 700, color: 'var(--text)', margin: '2.2em 0 0.7em', letterSpacing: '0.02em', lineHeight: 1.3 }}>{text}</h2>
-  if (style === 'h3') return <h3 key={index} style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--accent)', margin: '2em 0 0.6em' }}>{text}</h3>
-  if (style === 'blockquote') return <blockquote key={index} style={{ borderLeft: '2px solid var(--accent)', paddingLeft: '20px', margin: '2em 0', fontFamily: 'var(--font-serif)', fontSize: '16px', fontStyle: 'italic', fontWeight: 300, color: 'var(--text)', lineHeight: 1.8 }}>{text}</blockquote>
-  return <p key={index} style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', fontWeight: 300, color: 'var(--text2)', lineHeight: 1.95, marginBottom: '1.6em' }}>{text}</p>
+
+  if (style === 'h2') return <h2 key={index} style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', fontWeight: 700, color: 'var(--text)', margin: '2.2em 0 0.7em', letterSpacing: '0.02em', lineHeight: 1.3 }}>{children}</h2>
+  if (style === 'h3') return <h3 key={index} style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--accent)', margin: '2em 0 0.6em' }}>{children}</h3>
+  if (style === 'blockquote') return <blockquote key={index} style={{ borderLeft: '2px solid var(--accent)', paddingLeft: '20px', margin: '2em 0', fontFamily: 'var(--font-serif)', fontSize: '16px', fontStyle: 'italic', fontWeight: 300, color: 'var(--text)', lineHeight: 1.8 }}>{children}</blockquote>
+  if (block.listItem === 'bullet') return <li key={index} style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', fontWeight: 300, color: 'var(--text2)', lineHeight: 1.95, marginBottom: '0.4em' }}>{children}</li>
+  if (block.listItem === 'number') return <li key={index} style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', fontWeight: 300, color: 'var(--text2)', lineHeight: 1.95, marginBottom: '0.4em' }}>{children}</li>
+  return <p key={index} style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', fontWeight: 300, color: 'var(--text2)', lineHeight: 1.95, marginBottom: '1.6em' }}>{children}</p>
+}
+
+function renderBlocks(blocks) {
+  if (!blocks) return null
+  const result = []
+  let i = 0
+  while (i < blocks.length) {
+    const block = blocks[i]
+    if (block._type === 'block' && block.listItem === 'bullet') {
+      const items = []
+      while (i < blocks.length && blocks[i]._type === 'block' && blocks[i].listItem === 'bullet') {
+        items.push(renderBlock(blocks[i], i))
+        i++
+      }
+      result.push(<ul key={`ul-${i}`} style={{ paddingLeft: '1.5em', marginBottom: '1.6em' }}>{items}</ul>)
+    } else if (block._type === 'block' && block.listItem === 'number') {
+      const items = []
+      while (i < blocks.length && blocks[i]._type === 'block' && blocks[i].listItem === 'number') {
+        items.push(renderBlock(blocks[i], i))
+        i++
+      }
+      result.push(<ol key={`ol-${i}`} style={{ paddingLeft: '1.5em', marginBottom: '1.6em' }}>{items}</ol>)
+    } else {
+      result.push(renderBlock(block, i))
+      i++
+    }
+  }
+  return result
 }
 
 const catMap = { review: '評測', unboxing: '開箱', culture: '新聞', release: '發售', 'brand-story': '品牌故事' }
@@ -130,14 +174,8 @@ export default async function ArticlePage({ params }) {
     datePublished: article.publishedAt,
     dateModified: article._updatedAt || article.publishedAt,
     author: { '@type': 'Person', name: article.author || 'F.RAW 阜絡' },
-    publisher: {
-      '@type': 'Organization',
-      name: 'F.RAW 阜絡',
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': `https://fraw.tw/article/${slug}`,
-    },
+    publisher: { '@type': 'Organization', name: 'F.RAW 阜絡' },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://fraw.tw/article/${slug}` },
   }
 
   const navItems = settings?.navLinks?.length > 0
@@ -151,10 +189,7 @@ export default async function ArticlePage({ params }) {
 
   return (
     <div>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <style>{`
         .article-layout {
           max-width: 1200px;
@@ -176,11 +211,6 @@ export default async function ArticlePage({ params }) {
         .related-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
         .related-thumb { width: 64px; height: 48px; background: var(--surface2); flex-shrink: 0; position: relative; overflow: hidden; }
         .related-thumb img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
-        .ad-block { display: block; width: 100%; margin-bottom: 12px; }
-        .ad-block:last-child { margin-bottom: 0; }
-        .ad-block img { width: 100%; height: auto; display: block; }
-        .ad-block:hover img { opacity: 0.85; }
-        .ad-label { font-family: var(--font-mono); font-size: 11px; color: var(--text); margin-top: 6px; display: block; }
         .article-nav-spread { display: flex; flex: 1; justify-content: space-evenly; padding-left: 10%; padding-right: 5%; }
         .article-footer { padding: 22px 32px; display: flex; align-items: center; justify-content: space-between; border-top: 0.5px solid var(--border); }
 
@@ -216,7 +246,7 @@ export default async function ArticlePage({ params }) {
             ))}
           </div>
           <MobileNav navItems={navItems} siteTitle="F.RAW 阜絡" />
-<SearchBar />
+          <SearchBar />
         </div>
       </nav>
 
@@ -246,20 +276,20 @@ export default async function ArticlePage({ params }) {
           )}
 
           {youtubeIds.map((id, i) => (
-  <div key={i} className="youtube-wrap">
-    <iframe src={`https://www.youtube.com/embed/${id}`} title={`${article.title} ${i + 1}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-  </div>
-))}
+            <div key={i} className="youtube-wrap">
+              <iframe src={`https://www.youtube.com/embed/${id}`} title={`${article.title} ${i + 1}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+            </div>
+          ))}
 
-{(article.instagramUrls || []).map((url, i) => (
-  <div key={i} className="ig-wrap"><InstagramEmbed url={url} type="post" /></div>
-))}
+          {(article.instagramUrls || []).map((url, i) => (
+            <div key={i} className="ig-wrap"><InstagramEmbed url={url} type="post" /></div>
+          ))}
 
-{(article.instagramReelUrls || []).map((url, i) => (
-  <div key={i} className="ig-wrap"><InstagramEmbed url={url} type="reel" /></div>
-))}
+          {(article.instagramReelUrls || []).map((url, i) => (
+            <div key={i} className="ig-wrap"><InstagramEmbed url={url} type="reel" /></div>
+          ))}
 
-          <div>{article.body?.map((block, i) => renderBlock(block, i))}</div>
+          <div>{renderBlocks(article.body)}</div>
 
           <div style={{ marginTop: '60px', paddingTop: '24px', borderTop: '0.5px solid var(--border)' }}>
             <Link href="/" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)' }}>← 返回 F.RAW</Link>
@@ -270,16 +300,14 @@ export default async function ArticlePage({ params }) {
           {sidebarAds.length > 0 && (
             <div className="sidebar-section">
               <span className="sidebar-label">推薦好物</span>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
- <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-  {sidebarAds.map((ad, i) => (
-    <a key={i} href={ad.url} target="_blank" rel="noopener noreferrer sponsored" style={{ display: 'block', textDecoration: 'none' }}>
-      {ad.image && <img src={urlFor(ad.image).width(180).height(180).url()} alt={ad.label || '廣告'} style={{ width: '100%', height: 'auto', display: 'block' }} />}
-      {ad.label && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--text)', marginTop: '4px', display: 'block', lineHeight: 1.3 }}>{ad.label}</span>}
-    </a>
-  ))}
-</div>
-</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {sidebarAds.map((ad, i) => (
+                  <a key={i} href={ad.url} target="_blank" rel="noopener noreferrer sponsored" style={{ display: 'block', textDecoration: 'none' }}>
+                    {ad.image && <img src={urlFor(ad.image).width(180).height(180).url()} alt={ad.label || '廣告'} style={{ width: '100%', height: 'auto', display: 'block' }} />}
+                    {ad.label && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '8px', color: 'var(--text)', marginTop: '4px', display: 'block', lineHeight: 1.3 }}>{ad.label}</span>}
+                  </a>
+                ))}
+              </div>
             </div>
           )}
 
@@ -302,11 +330,9 @@ export default async function ArticlePage({ params }) {
         </aside>
       </div>
 
-     {/* FOOTER */}
-      <footer className="footer-wrap">
-        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>
-          {settings?.siteTitle || 'F.RAW 阜絡'}
-        </span>
+      {/* FOOTER */}
+      <footer className="article-footer">
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, letterSpacing: '0.22em', color: 'var(--hint)' }}>F.RAW 阜絡</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <a href="https://www.instagram.com/fraw.tw/" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--muted)', textDecoration: 'none' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -323,7 +349,7 @@ export default async function ArticlePage({ params }) {
             </svg>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase' }}>聯絡我們</span>
           </a>
-<Link href="/about" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>關於我們</Link>
+          <Link href="/about" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>關於我們</Link>
           <Link href="/privacy" style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>隱私權政策</Link>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--hint)' }}>© 2025 F.RAW 阜絡</span>
         </div>
